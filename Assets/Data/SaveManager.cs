@@ -5,21 +5,6 @@ namespace Player.save
 {
     public class SaveManager : MonoBehaviour
     {
-        private void Start()
-        {
-            // var tmp = new CharaData();
-            // tmp.name = "test";
-            // tmp.hp.max = 100;
-            // tmp.hp.now = 100;
-            var savePath = Application.persistentDataPath + "/save.json";
-            // Save(tmp,savePath);
-            Clean(savePath);
-            var s = Load<CharaData>(savePath);
-            var saveJson = JsonUtility.ToJson(s);
-            Debug.Log(saveJson);
-            Debug.Log(s.name);
-        }
-
         public static void Clean(string path)
         {
             File.WriteAllText(path, "");

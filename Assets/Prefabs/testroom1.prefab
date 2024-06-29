@@ -33,7 +33,7 @@ Transform:
   m_Children:
   - {fileID: 913885576509941809}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1477173140785882326
 SpriteRenderer:
@@ -154,7 +154,7 @@ MonoBehaviour:
   startPos: {x: 0, y: 0}
   layerMask:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 72
 --- !u!1001 &5401807929482830082
 PrefabInstance:
   m_ObjectHideFlags: 0

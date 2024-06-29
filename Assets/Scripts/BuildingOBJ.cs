@@ -68,13 +68,16 @@ public class BuildingOBJ : ClickableOBJ
     {
         Collider2D[] results = new Collider2D[10];
         int count = editGridCollider.OverlapCollider(contactFilter,results);
-        if (count>0)
+
+        
+
+        if (count != 1)
         {
-            editGridSprite.material.color = new Color(0.792f, 0.255f, 0.227f, 1.0f);
+            editGridSprite.material.color = new Color(0.792f, 0.255f, 0.227f, 1.0f);//red
         }
         else
         {
-            editGridSprite.material.color = new Color(0.227f, 0.666f, 0.792f, 1.0f);
+            editGridSprite.material.color = new Color(0.227f, 0.666f, 0.792f, 1.0f);//blue
         }
     }
 }

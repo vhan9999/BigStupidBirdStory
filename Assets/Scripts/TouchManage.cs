@@ -71,4 +71,5 @@ public class TouchManage : MonoBehaviour
         var b = Instantiate(buildingPrefab, buildingContainer.transform);
         b.GetComponent<BuildingOBJ>().Click();
     }
+
 }

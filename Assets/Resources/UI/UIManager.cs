@@ -18,8 +18,36 @@ public class UIManager : MonoBehaviour
         var b = canvas.transform.Find("Body/CharaStorageButton").GetComponent<Button>();
         b.onClick.AddListener(CharaStorageButtonClick());
         _charaStoragePanel = canvas.transform.Find("Body/CharaStoragePanel").GameObject();
-        _charaStorage = new List<CharaData>();
-        _charaStorage.Add(new CharaData
+        _charaStorage = GetMockCharaStorage();
+        var charaStorageView = canvas.transform.Find("Body/CharaStoragePanel/View/Viewport/Content").GameObject();
+        var charaContainer = GameObject.Find("CharaContainer");
+        var charaCardPrefab = Resources.Load<GameObject>("UI/CharaCard");
+        var charaPrefab = Resources.Load<GameObject>("Chara/CharaPrefab");
+        var tmp = 0;
+        foreach (var data in _charaStorage)
+        {
+            {
+                var go = Instantiate(charaCardPrefab, charaStorageView.transform);
+                go.GetComponent<CharaCard>().SetName(data.name);
+            }
+            {
+                var go = Instantiate(charaPrefab, charaContainer.transform);
+                go.GetComponent<CharaBehavier>().SetCharaData(data);
+                go.transform.position = new Vector3(tmp, 0, 0);
+                tmp += 2;
+            }
+        }
+    }
+
+    // Update is called once per frame
+    private void Update()
+    {
+    }
+
+    private List<CharaData> GetMockCharaStorage()
+    {
+        var c = new List<CharaData>();
+        c.Add(new CharaData
         {
             name = "Chara1",
             battleData = new BattleData
@@ -51,7 +79,7 @@ public class UIManager : MonoBehaviour
                 max = 100
             }
         });
-        _charaStorage.Add(new CharaData
+        c.Add(new CharaData
         {
             name = "Chara2",
             battleData = new BattleData
@@ -83,20 +111,7 @@ public class UIManager : MonoBehaviour
                 max = 100
             }
         });
-
-        var charaStorageView = canvas.transform.Find("Body/CharaStoragePanel/View/Viewport/Content").GameObject();
-        var charaCardPrefab = Resources.Load<GameObject>("UI/CharaCard");
-        foreach (var data in _charaStorage)
-        {
-            var go = Instantiate(charaCardPrefab, charaStorageView.transform);
-            go.GetComponent<CharaCard>().SetName(data.name);
-        }
-        
-    }
-
-    // Update is called once per frame
-    private void Update()
-    {
+        return c;
     }
 
     private UnityAction CharaStorageButtonClick()

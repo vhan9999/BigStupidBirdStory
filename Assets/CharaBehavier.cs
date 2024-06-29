@@ -24,13 +24,6 @@ public class CharaBehavier : MonoBehaviour
 
     private void Start()
     {
-        var d = new CharaData
-        {
-            name = "test", battleData = new BattleData { atk = 1, def = 1, cri = 1, spd = 1, dodge = 1 },
-            energy = new MaxableNumber { now = 1, max = 1 }, hp = new MaxableNumber { now = 1, max = 1 },
-            hunger = new MaxableNumber { now = 1, max = 1 }, mood = new MaxableNumber { now = 1, max = 1 }
-        };
-        SetCharaData(d);
     }
 
     private void Update()

@@ -1,75 +1,138 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+internal enum ControlState
+{
+    Normal,
+    Edit
+}
+
 public class TouchManage : MonoBehaviour
 {
-
-    GameObject flagGameObject = null;
-    private bool isDragging = false;
-    private Vector3 startPoint;
-
     public GameObject buildingPrefab;
     public GameObject buildingContainer;
-    // Start is called before the first frame update
-    void Start()
+    public List<BuildingOBJ> buildingList = new();
+    private ControlState controlState;
+
+    private BuildingOBJ flagGameObject;
+
+    private bool isTouchBuilding;
+    private BuildingOBJ movingGameObject;
+    private Vector3 startPoint;
+
+    private void Awake()
     {
-        
+        buildingList = new List<BuildingOBJ>();
+        controlState = ControlState.Normal;
+    }
+
+    private void Start()
+    {
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        if (Input.touchCount > 0)
+        if (Input.touchCount == 1)
         {
-            Touch touch = Input.GetTouch(0);
+            var touch = Input.GetTouch(0);
 
-            switch (touch.phase)
+            switch (controlState)
             {
-                case TouchPhase.Began:
-                    startPoint = Camera.main.ScreenToWorldPoint(touch.position);
-                    Collider2D collider = Physics2D.OverlapPoint(startPoint);
-
-                    if (collider != null && collider.TryGetComponent(out ClickableOBJ clickableOBJ))
-                    {
-                        flagGameObject = collider.gameObject;
-                        if (flagGameObject.TryGetComponent(out BuildingOBJ building) && building.isEditing)
-                        {
-                            building.startPos = flagGameObject.transform.position;//update building's startPos
-                            isDragging = true;
-                        }
-                    }
+                case ControlState.Normal:
+                    NormalControl(touch);
                     break;
-
-                case TouchPhase.Moved:
-                    if (isDragging)
-                    {
-                        Vector3 displacement = (Camera.main.ScreenToWorldPoint(touch.position) - startPoint);
-                        flagGameObject.GetComponent<BuildingOBJ>().Move(displacement);
-                    }
-                    break;
-
-                case TouchPhase.Ended:
-                    Vector3 endPoint = Camera.main.ScreenToWorldPoint(touch.position);
-                    if (flagGameObject != null)
-                    {
-                        if((Vector2)endPoint == (Vector2)startPoint)
-                            flagGameObject.GetComponent<ClickableOBJ>().Click();
-                    }
-                    flagGameObject = null;
-                    isDragging = false;
+                case ControlState.Edit:
+                    EditControl(touch);
                     break;
             }
         }
+    }
 
+    private void NormalControl(Touch touch)
+    {
+        switch (touch.phase)
+        {
+            case TouchPhase.Began:
+                startPoint = Camera.main.ScreenToWorldPoint(touch.position);
+                var collider = Physics2D.OverlapPoint(startPoint);
+                if (collider != null && collider.TryGetComponent(out BuildingOBJ building)) flagGameObject = building;
 
+                break;
+
+            case TouchPhase.Moved:
+                break;
+
+            case TouchPhase.Ended:
+                var endPoint = Camera.main.ScreenToWorldPoint(touch.position);
+                if ((Vector2)endPoint == (Vector2)startPoint)
+                {
+                    movingGameObject = flagGameObject;
+                    movingGameObject.SetColor(BuildingOBJ.EditState.NoOverlapping);
+                    movingGameObject.SetStartPos(startPoint);
+                    controlState = ControlState.Edit;
+                }
+
+                flagGameObject = null;
+                break;
+        }
+    }
+
+    private BuildingOBJ TouchBuilding(Vector2 position)
+    {
+        var collider = Physics2D.OverlapPoint(position);
+        if (collider != null && collider.TryGetComponent(out BuildingOBJ building)) return building;
+
+        return null;
+    }
+
+    private void EditControl(Touch touch)
+    {
+        switch (touch.phase)
+        {
+            case TouchPhase.Began:
+                startPoint = Camera.main.ScreenToWorldPoint(touch.position);
+                var touchBuilding = TouchBuilding(startPoint);
+                if (touchBuilding != null)
+                    isTouchBuilding = true;
+                else
+                    isTouchBuilding = false;
+                break;
+
+            case TouchPhase.Moved:
+                var displacement = Camera.main.ScreenToWorldPoint(touch.position) - startPoint;
+                if (isTouchBuilding) movingGameObject.Move(displacement);
+
+                break;
+
+            case TouchPhase.Ended:
+                if (isTouchBuilding)
+                {
+                    var endPoint = Camera.main.ScreenToWorldPoint(touch.position);
+                    if ((Vector2)endPoint == (Vector2)startPoint && !movingGameObject.IsOverlapping())
+                    {
+                        movingGameObject.SetColor(BuildingOBJ.EditState.Normal);
+                        movingGameObject = null;
+                        controlState = ControlState.Normal;
+                    }
+                }
+
+                break;
+        }
     }
 
     public void CreateBuilding()
     {
         //todo:building type
+        if (controlState == ControlState.Edit) return;
         var b = Instantiate(buildingPrefab, buildingContainer.transform);
-        b.GetComponent<BuildingOBJ>().Click();
+        var bobj = b.GetComponent<BuildingOBJ>();
+        movingGameObject.SetColor(BuildingOBJ.EditState.Normal);
+        movingGameObject = flagGameObject;
+        // todo: null error neeed to fix
+        movingGameObject.SetColor(BuildingOBJ.EditState.NoOverlapping);
+        movingGameObject.SetStartPos(startPoint);
+        controlState = ControlState.Edit;
+        buildingList.Add(bobj);
     }
-
 }

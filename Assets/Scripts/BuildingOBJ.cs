@@ -1,83 +1,111 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.EventSystems;
 using System;
+using UnityEngine;
 
 public class BuildingOBJ : ClickableOBJ
 {
-    public bool isEditing = false;
+    public enum EditState
+    {
+        Normal,
+        Overlapping,
+        NoOverlapping
+    }
+
+    public bool isEditing;
     public Vector2 startPos = Vector2.zero;
 
     public LayerMask layerMask;
-    ContactFilter2D contactFilter = new ContactFilter2D();
+    private ContactFilter2D contactFilter;
 
-    private GameObject editGrid = null;
-    private PolygonCollider2D editGridCollider = null;
-    private SpriteRenderer editGridSprite = null;
+    private GameObject editGrid;
+    private PolygonCollider2D editGridCollider;
+    private SpriteRenderer editGridSprite;
+
     private void Awake()
     {
         contactFilter.SetLayerMask(layerMask);
-        Debug.Log("aaa");
         editGrid = transform.GetChild(0).gameObject;
         editGridCollider = editGrid.GetComponent<PolygonCollider2D>();
         editGridSprite = editGrid.GetComponent<SpriteRenderer>();
-        editGridSprite.material.color = new Color(1f, 1f, 1f, 0f);
+        SetColor(EditState.Normal);
+    }
+
+    public void SetColor(EditState state)
+    {
+        switch (state)
+        {
+            case EditState.Normal:
+                editGridSprite.material.color = new Color(1f, 1f, 1f, 0f);
+                break;
+            case EditState.Overlapping:
+                editGridSprite.material.color = new Color(0.792f, 0.255f, 0.227f, 1.0f);
+                break;
+            case EditState.NoOverlapping:
+                editGridSprite.material.color = new Color(0.227f, 0.666f, 0.792f, 1.0f);
+                break;
+        }
     }
 
     public override void Click()
     {
-        if (isEditing)//edit stop
+        if (isEditing) //edit stop
         {
             isEditing = false;
-            editGridSprite.material.color = new Color(1f, 1f, 1f, 0f);
+            SetColor(EditState.Normal);
 
             //edit z
             transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.y);
             editGrid.transform.position = new Vector3(transform.position.x, transform.position.y, 100);
         }
-        else//edit start
+        else //edit start
         {
-            
             isEditing = true;
-            
+
             startPos = transform.position;
-            IsOverlapping();    
+            IsOverlapping();
 
             //edit z
             transform.position = new Vector3(transform.position.x, transform.position.y, -5f);
             editGrid.transform.position = new Vector3(transform.position.x, transform.position.y, -4.99999f);
         }
-        
     }
+
     public void Move(Vector3 displacement)
     {
-        Vector2 gridMovePos = GridManage.RealToGrid(displacement.x, displacement.y);
-        gridMovePos = new Vector2((float)Math.Truncate(gridMovePos.x), (float)Math.Truncate(gridMovePos.y));//remove numbers behind "."
+        var gridMovePos = GridManage.RealToGrid(displacement.x, displacement.y);
+        gridMovePos =
+            new Vector2((float)Math.Truncate(gridMovePos.x),
+                (float)Math.Truncate(gridMovePos.y)); //remove numbers behind "."
 
-        Vector2 realMovePos = GridManage.GridToReal(gridMovePos.x, gridMovePos.y);
-        if (startPos + realMovePos != (Vector2)transform.position)//whether move
+        var realMovePos = GridManage.GridToReal(gridMovePos.x, gridMovePos.y);
+        if (startPos + realMovePos != (Vector2)transform.position) //whether move
         {
-            transform.position = new Vector3(startPos.x + realMovePos.x, startPos.y + realMovePos.y,-5);
+            transform.position = new Vector3(startPos.x + realMovePos.x, startPos.y + realMovePos.y, -5);
             editGrid.transform.position = new Vector3(transform.position.x, transform.position.y, -4.99999f);
             Invoke("IsOverlapping", 0.02f);
         }
     }
 
-    private void IsOverlapping()
+    public bool IsOverlapping()
     {
-        Collider2D[] results = new Collider2D[10];
-        int count = editGridCollider.OverlapCollider(contactFilter,results);
-
-        
-
+        var results = new Collider2D[10];
+        var count = editGridCollider.OverlapCollider(contactFilter, results);
         if (count != 1)
         {
             editGridSprite.material.color = new Color(0.792f, 0.255f, 0.227f, 1.0f);//red
+            SetColor(EditState.Overlapping);
+            return true;
         }
         else
         {
             editGridSprite.material.color = new Color(0.227f, 0.666f, 0.792f, 1.0f);//blue
         }
+
+        SetColor(EditState.NoOverlapping);
+        return false;
+    }
+
+    public void SetStartPos(Vector2 pos)
+    {
+        startPos = pos;
     }
 }

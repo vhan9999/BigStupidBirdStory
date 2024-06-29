@@ -3,7 +3,7 @@ using System;
 namespace Player.save
 {
     [Serializable]
-    internal struct CharaData
+    public struct CharaData
     {
         public string name;
         public BattleData battleData;

@@ -51,14 +51,11 @@ public class TouchManage : MonoBehaviour
 
     private void NormalControl(Touch touch)
     {
-        Debug.Log("NormalControl");
         switch (touch.phase)
         {
             case TouchPhase.Began:
                 startPoint = Camera.main.ScreenToWorldPoint(touch.position);
-                var collider = Physics2D.OverlapPoint(startPoint);
-                if (collider != null && collider.TryGetComponent(out BuildingOBJ building)) flagGameObject = building;
-
+                flagGameObject = TouchBuilding(startPoint);
                 break;
 
             case TouchPhase.Moved:
@@ -88,8 +85,19 @@ public class TouchManage : MonoBehaviour
 
     private void EditControl(Touch touch)
     {
-        if (movingGameObject != null) movingGameObject.IsOverlapping();
-        Debug.Log("EditControl");
+        // update grid color
+        if (movingGameObject != null)
+        {
+            if (movingGameObject.IsOverlapping())
+            {
+                movingGameObject.SetColor(BuildingOBJ.EditState.Overlapping);
+            }
+            else
+            {
+                movingGameObject.SetColor(BuildingOBJ.EditState.NoOverlapping);
+            }
+        }
+        
         switch (touch.phase)
         {
             case TouchPhase.Began:
@@ -144,7 +152,6 @@ public class TouchManage : MonoBehaviour
         var bobj = b.GetComponent<BuildingOBJ>();
         if (movingGameObject != null) movingGameObject.SetColor(BuildingOBJ.EditState.Normal);
         movingGameObject = bobj;
-        // todo: null error neeed to fix
         movingGameObject.SetColor(BuildingOBJ.EditState.NoOverlapping);
         startPoint = movingGameObject.transform.position;
         controlState = ControlState.Edit;

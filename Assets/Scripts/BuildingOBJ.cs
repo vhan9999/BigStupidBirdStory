@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class BuildingOBJ : ClickableOBJ
@@ -14,9 +13,9 @@ public class BuildingOBJ : ClickableOBJ
     public Vector2 startPos = Vector2.zero;
 
     public LayerMask layerMask;
-    private ContactFilter2D contactFilter;
 
-    private GameObject editGrid;
+    public GameObject editGrid;
+    private ContactFilter2D contactFilter;
     private PolygonCollider2D editGridCollider;
     private SpriteRenderer editGridSprite;
 
@@ -27,6 +26,7 @@ public class BuildingOBJ : ClickableOBJ
         editGridCollider = editGrid.GetComponent<PolygonCollider2D>();
         editGridSprite = editGrid.GetComponent<SpriteRenderer>();
         SetColor(EditState.Normal);
+        Debug.Log("awake done");
     }
 
     public void SetColor(EditState state)
@@ -69,36 +69,18 @@ public class BuildingOBJ : ClickableOBJ
         }
     }
 
-    public void Move(Vector3 displacement)
-    {
-        var gridMovePos = GridManage.RealToGrid(displacement.x, displacement.y);
-        gridMovePos =
-            new Vector2((float)Math.Truncate(gridMovePos.x),
-                (float)Math.Truncate(gridMovePos.y)); //remove numbers behind "."
-
-        var realMovePos = GridManage.GridToReal(gridMovePos.x, gridMovePos.y);
-        if (startPos + realMovePos != (Vector2)transform.position) //whether move
-        {
-            transform.position = new Vector3(startPos.x + realMovePos.x, startPos.y + realMovePos.y, -5);
-            editGrid.transform.position = new Vector3(transform.position.x, transform.position.y, -4.99999f);
-            Invoke("IsOverlapping", 0.02f);
-        }
-    }
-
     public bool IsOverlapping()
     {
         var results = new Collider2D[10];
         var count = editGridCollider.OverlapCollider(contactFilter, results);
         if (count != 1)
         {
-            editGridSprite.material.color = new Color(0.792f, 0.255f, 0.227f, 1.0f);//red
+            editGridSprite.material.color = new Color(0.792f, 0.255f, 0.227f, 1.0f); //red
             SetColor(EditState.Overlapping);
             return true;
         }
-        else
-        {
-            editGridSprite.material.color = new Color(0.227f, 0.666f, 0.792f, 1.0f);//blue
-        }
+
+        editGridSprite.material.color = new Color(0.227f, 0.666f, 0.792f, 1.0f); //blue
 
         SetColor(EditState.NoOverlapping);
         return false;

@@ -51,6 +51,7 @@ public class TouchManage : MonoBehaviour
 
     private void NormalControl(Touch touch)
     {
+        Debug.Log("NormalControl");
         switch (touch.phase)
         {
             case TouchPhase.Began:
@@ -65,7 +66,7 @@ public class TouchManage : MonoBehaviour
 
             case TouchPhase.Ended:
                 var endPoint = Camera.main.ScreenToWorldPoint(touch.position);
-                if ((Vector2)endPoint == (Vector2)startPoint)
+                if ((Vector2)endPoint == (Vector2)startPoint && flagGameObject != null)
                 {
                     movingGameObject = flagGameObject;
                     movingGameObject.SetColor(BuildingOBJ.EditState.NoOverlapping);
@@ -88,28 +89,43 @@ public class TouchManage : MonoBehaviour
 
     private void EditControl(Touch touch)
     {
+        if (movingGameObject != null) movingGameObject.IsOverlapping();
+        Debug.Log("EditControl");
         switch (touch.phase)
         {
             case TouchPhase.Began:
+            {
                 startPoint = Camera.main.ScreenToWorldPoint(touch.position);
                 var touchBuilding = TouchBuilding(startPoint);
                 if (touchBuilding != null)
                     isTouchBuilding = true;
                 else
                     isTouchBuilding = false;
+            }
                 break;
 
             case TouchPhase.Moved:
-                var displacement = Camera.main.ScreenToWorldPoint(touch.position) - startPoint;
-                if (isTouchBuilding) movingGameObject.Move(displacement);
+                var displacement = Camera.main.ScreenToWorldPoint(touch.position) ;
+                if (isTouchBuilding)
+                {
+                    var realMovePos = GridManage.RealToGridToReal(displacement.x, displacement.y);
+                    if (realMovePos != (Vector2)movingGameObject.transform.position) //whether move
+                    {
+                        movingGameObject.transform.position = new Vector3(realMovePos.x, realMovePos.y, -5);
+                        movingGameObject.editGrid.transform.position = new Vector3(
+                            movingGameObject.transform.position.x, movingGameObject.transform.position.y, -4.99999f);
+                    }
+                }
 
                 break;
 
             case TouchPhase.Ended:
                 if (isTouchBuilding)
                 {
+                    var touchBuilding = TouchBuilding(Camera.main.ScreenToWorldPoint(touch.position));
                     var endPoint = Camera.main.ScreenToWorldPoint(touch.position);
-                    if ((Vector2)endPoint == (Vector2)startPoint && !movingGameObject.IsOverlapping())
+                    if ((Vector2)endPoint == (Vector2)startPoint && !movingGameObject.IsOverlapping() &&
+                        touchBuilding == movingGameObject)
                     {
                         movingGameObject.SetColor(BuildingOBJ.EditState.Normal);
                         movingGameObject = null;
@@ -127,11 +143,12 @@ public class TouchManage : MonoBehaviour
         if (controlState == ControlState.Edit) return;
         var b = Instantiate(buildingPrefab, buildingContainer.transform);
         var bobj = b.GetComponent<BuildingOBJ>();
-        movingGameObject.SetColor(BuildingOBJ.EditState.Normal);
-        movingGameObject = flagGameObject;
+        if (movingGameObject != null) movingGameObject.SetColor(BuildingOBJ.EditState.Normal);
+        movingGameObject = bobj;
         // todo: null error neeed to fix
         movingGameObject.SetColor(BuildingOBJ.EditState.NoOverlapping);
-        movingGameObject.SetStartPos(startPoint);
+        movingGameObject.SetStartPos(movingGameObject.transform.position);
+        startPoint = movingGameObject.transform.position;
         controlState = ControlState.Edit;
         buildingList.Add(bobj);
     }

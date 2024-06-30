@@ -70,7 +70,6 @@ public class TouchManage : MonoBehaviour
                 {
                     movingGameObject = flagGameObject;
                     movingGameObject.SetColor(BuildingOBJ.EditState.NoOverlapping);
-                    movingGameObject.SetStartPos(startPoint);
                     controlState = ControlState.Edit;
                 }
 
@@ -105,7 +104,7 @@ public class TouchManage : MonoBehaviour
                 break;
 
             case TouchPhase.Moved:
-                var displacement = Camera.main.ScreenToWorldPoint(touch.position) ;
+                var displacement = Camera.main.ScreenToWorldPoint(touch.position);
                 if (isTouchBuilding)
                 {
                     var realMovePos = GridManage.RealToGridToReal(displacement.x, displacement.y);
@@ -147,7 +146,6 @@ public class TouchManage : MonoBehaviour
         movingGameObject = bobj;
         // todo: null error neeed to fix
         movingGameObject.SetColor(BuildingOBJ.EditState.NoOverlapping);
-        movingGameObject.SetStartPos(movingGameObject.transform.position);
         startPoint = movingGameObject.transform.position;
         controlState = ControlState.Edit;
         buildingList.Add(bobj);

@@ -9,8 +9,6 @@ public class BuildingOBJ : ClickableOBJ
         NoOverlapping
     }
 
-    public bool isEditing;
-    public Vector2 startPos = Vector2.zero;
 
     public LayerMask layerMask;
 
@@ -45,30 +43,6 @@ public class BuildingOBJ : ClickableOBJ
         }
     }
 
-    public override void Click()
-    {
-        if (isEditing) //edit stop
-        {
-            isEditing = false;
-            SetColor(EditState.Normal);
-
-            //edit z
-            transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.y);
-            editGrid.transform.position = new Vector3(transform.position.x, transform.position.y, 100);
-        }
-        else //edit start
-        {
-            isEditing = true;
-
-            startPos = transform.position;
-            IsOverlapping();
-
-            //edit z
-            transform.position = new Vector3(transform.position.x, transform.position.y, -5f);
-            editGrid.transform.position = new Vector3(transform.position.x, transform.position.y, -4.99999f);
-        }
-    }
-
     public bool IsOverlapping()
     {
         var results = new Collider2D[10];
@@ -84,10 +58,5 @@ public class BuildingOBJ : ClickableOBJ
 
         SetColor(EditState.NoOverlapping);
         return false;
-    }
-
-    public void SetStartPos(Vector2 pos)
-    {
-        startPos = pos;
     }
 }

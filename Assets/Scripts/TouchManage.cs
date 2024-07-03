@@ -120,7 +120,7 @@ public class TouchManage : MonoBehaviour
                     {
                         movingGameObject.transform.position = new Vector3(realMovePos.x, realMovePos.y, -5);
                         movingGameObject.editGrid.transform.position = new Vector3(
-                            movingGameObject.transform.position.x, movingGameObject.transform.position.y, -4.99999f);
+                        movingGameObject.transform.position.x, movingGameObject.transform.position.y, -4.99999f);
                     }
                 }
 
@@ -134,6 +134,12 @@ public class TouchManage : MonoBehaviour
                     if ((Vector2)endPoint == (Vector2)startPoint && !movingGameObject.IsOverlapping() &&
                         touchBuilding == movingGameObject)
                     {
+                        movingGameObject.transform.position = new Vector3(
+                        movingGameObject.transform.position.x, movingGameObject.transform.position.y, movingGameObject.transform.position.y);
+
+                        movingGameObject.editGrid.transform.position = new Vector3(
+                        movingGameObject.transform.position.x, movingGameObject.transform.position.y, 100f);
+
                         movingGameObject.SetColor(BuildingOBJ.EditState.Normal);
                         movingGameObject = null;
                         controlState = ControlState.Normal;

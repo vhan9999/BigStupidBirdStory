@@ -20,6 +20,10 @@ public class TouchManage : MonoBehaviour
     private BuildingOBJ movingGameObject;
     private Vector3 startPoint;
 
+    private static float CameraSizeMin => 1;
+
+    private static float CameraSizeMax => 8;
+
     private void Awake()
     {
         buildingList = new List<BuildingOBJ>();
@@ -47,6 +51,27 @@ public class TouchManage : MonoBehaviour
                     break;
             }
         }
+        else if (Input.touchCount == 2)
+        {
+            var touchZero = Input.GetTouch(0);
+            var touchOne = Input.GetTouch(1);
+
+            var preZero = touchZero.position - touchZero.deltaPosition;
+            var preOne = touchOne.position - touchOne.deltaPosition;
+            var prevMagnitude = (preOne - preZero).magnitude;
+            var currentMagnitude = (touchZero.position - touchOne.position).magnitude;
+
+            var diff = currentMagnitude - prevMagnitude;
+
+            Zoom(diff * 0.001f);
+        }
+    }
+
+
+    private void Zoom(float diff)
+    {
+        Camera.main.orthographicSize
+            = Mathf.Clamp(Camera.main.orthographicSize - diff, CameraSizeMin, CameraSizeMax);
     }
 
     private void NormalControl(Touch touch)
@@ -89,15 +114,11 @@ public class TouchManage : MonoBehaviour
         if (movingGameObject != null)
         {
             if (movingGameObject.IsOverlapping())
-            {
                 movingGameObject.SetColor(BuildingOBJ.EditState.Overlapping);
-            }
             else
-            {
                 movingGameObject.SetColor(BuildingOBJ.EditState.NoOverlapping);
-            }
         }
-        
+
         switch (touch.phase)
         {
             case TouchPhase.Began:

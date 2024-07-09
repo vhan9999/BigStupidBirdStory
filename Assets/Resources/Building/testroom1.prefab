@@ -26,7 +26,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 828356826362600090}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -122,8 +122,8 @@ PolygonCollider2D:
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.29896906}
-    oldSize: {x: 1.14, y: 0.97}
+    pivot: {x: 0.5, y: 0.010309278}
+    oldSize: {x: 2.0357144, y: 1.7321428}
     newSize: {x: 114, y: 97}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -131,12 +131,12 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: -0.48455107, y: 0.4347306}
-      - {x: -0.48794413, y: 0.002055794}
-      - {x: -0.00017951988, y: -0.24964081}
-      - {x: 0.48536503, y: -0.0076824427}
-      - {x: 0.48238885, y: 0.43293706}
-      - {x: -0.000077173114, y: 0.67694396}
+    - - {x: -0.867573, y: 1.2742308}
+      - {x: -0.87096614, y: 0.500509}
+      - {x: 0.005067328, y: 0.06517173}
+      - {x: 0.86314005, y: 0.5012646}
+      - {x: 0.8675503, y: 1.280968}
+      - {x: -0.000077173114, y: 1.7074199}
   m_UseDelaunayMesh: 0
 --- !u!114 &2864205452877705844
 MonoBehaviour:
@@ -150,8 +150,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 082712e9bc5476f45bdb136217c33bd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isEditing: 0
-  startPos: {x: 0, y: 0}
+  width: 2
+  editGrid: {fileID: 0}
   layerMask:
     serializedVersion: 2
     m_Bits: 72

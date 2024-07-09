@@ -1,3 +1,4 @@
+using NavMeshPlus.Components;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +10,8 @@ internal enum ControlState
 
 public class TouchManage : MonoBehaviour
 {
+    public NavMeshSurface surface2D;
+
     public GameObject buildingPrefab;
     public GameObject buildingContainer;
     public List<BuildingOBJ> buildingList = new();
@@ -28,6 +31,7 @@ public class TouchManage : MonoBehaviour
 
     private void Start()
     {
+        UpdateNavMesh();
     }
 
     // Update is called once per frame
@@ -65,6 +69,7 @@ public class TouchManage : MonoBehaviour
                 var endPoint = Camera.main.ScreenToWorldPoint(touch.position);
                 if ((Vector2)endPoint == (Vector2)startPoint && flagGameObject != null)
                 {
+                    
                     movingGameObject = flagGameObject;
                     movingGameObject.SetColor(BuildingOBJ.EditState.NoOverlapping);
                     controlState = ControlState.Edit;
@@ -134,8 +139,7 @@ public class TouchManage : MonoBehaviour
                     if ((Vector2)endPoint == (Vector2)startPoint && !movingGameObject.IsOverlapping() &&
                         touchBuilding == movingGameObject)
                     {
-                        movingGameObject.transform.position = new Vector3(
-                        movingGameObject.transform.position.x, movingGameObject.transform.position.y, movingGameObject.transform.position.y);
+                        SetBuildingZaxis(movingGameObject.width);
 
                         movingGameObject.editGrid.transform.position = new Vector3(
                         movingGameObject.transform.position.x, movingGameObject.transform.position.y, 100f);
@@ -143,6 +147,9 @@ public class TouchManage : MonoBehaviour
                         movingGameObject.SetColor(BuildingOBJ.EditState.Normal);
                         movingGameObject = null;
                         controlState = ControlState.Normal;
+
+                        //TODO use button to do
+                        Invoke("UpdateNavMesh", 0.02f);
                     }
                 }
 
@@ -162,5 +169,16 @@ public class TouchManage : MonoBehaviour
         startPoint = movingGameObject.transform.position;
         controlState = ControlState.Edit;
         buildingList.Add(bobj);
+    }
+
+    private void SetBuildingZaxis(int width)
+    {
+        movingGameObject.transform.position =
+        new Vector3(movingGameObject.transform.position.x, movingGameObject.transform.position.y, movingGameObject.transform.position.y + (0.25f * width));
+    }
+
+    public void UpdateNavMesh()
+    {
+        surface2D.UpdateNavMesh(surface2D.navMeshData);
     }
 }

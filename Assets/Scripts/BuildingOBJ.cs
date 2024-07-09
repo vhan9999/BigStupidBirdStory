@@ -10,10 +10,13 @@ public class BuildingOBJ : ClickableOBJ
     }
 
 
-    public LayerMask layerMask;
+    public int width;
+
 
     public GameObject editGrid;
-    private ContactFilter2D contactFilter;
+
+    public LayerMask layerMask;
+    private ContactFilter2D contactFilter;//filter layers
     private PolygonCollider2D editGridCollider;
     private SpriteRenderer editGridSprite;
 

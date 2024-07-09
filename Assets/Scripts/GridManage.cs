@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class GridManage : MonoBehaviour
 {
-    private static readonly float gridWidth = 0.56f;
+    private static readonly float gridWidth = 1f;
 
-    private static readonly float gridHeight = 0.28f;
+    private static readonly float gridHeight = 0.5f;
 
     public static Vector2 GridToReal(Vector2 gird)
     {
@@ -43,5 +43,18 @@ public class GridManage : MonoBehaviour
     {
         var grid = RealToGrid(realX, realY);
         return GridToReal(grid);
+    }
+
+    public static float CalculateOval(Vector2 direction)//width:hight = 2:1 (output: 0.5 ~ 1)
+    {
+
+        Vector2 normDirection = direction.normalized;
+
+        float dx_prime = normDirection.x / gridWidth;
+        float dy_prime = normDirection.y / gridHeight;
+
+        float scale = Mathf.Sqrt(dx_prime * dx_prime + dy_prime * dy_prime);
+
+        return 1.0f / scale;
     }
 }

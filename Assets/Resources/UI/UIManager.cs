@@ -55,7 +55,7 @@ public class UIManager : MonoBehaviour
                 atk = 10,
                 def = 10,
                 cri = 10,
-                spd = 10,
+                movspd = 1,
                 dodge = 10
             },
             energy = new MaxableNumber
@@ -87,7 +87,7 @@ public class UIManager : MonoBehaviour
                 atk = 20,
                 def = 20,
                 cri = 20,
-                spd = 20,
+                movspd = 1,
                 dodge = 20
             },
             energy = new MaxableNumber

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5069317765002430771}
   - component: {fileID: 8739017417361952961}
   - component: {fileID: 8344397782874525240}
+  - component: {fileID: 6137742309308839614}
   m_Layer: 3
   m_Name: edit_2x2_grid
   m_TagString: Untagged
@@ -120,8 +121,8 @@ PolygonCollider2D:
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.14, y: 0.58}
+    pivot: {x: 0.5, y: 0.01724138}
+    oldSize: {x: 2.0357144, y: 1.0357143}
     newSize: {x: 1.14, y: 0.58}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -129,8 +130,26 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: -0.5161378, y: 0}
-      - {x: 0, y: -0.26553112}
-      - {x: 0.5161378, y: 0}
-      - {x: 0, y: 0.2655311}
+    - - {x: -0.9, y: 0.51}
+      - {x: -0.9, y: 0.49}
+      - {x: 0, y: 0.05}
+      - {x: 0.9, y: 0.49}
+      - {x: 0.9, y: 0.51}
+      - {x: 0, y: 0.95}
   m_UseDelaunayMesh: 0
+--- !u!114 &6137742309308839614
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5977524717339978703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9809bf1345abc5648af68b3a82653f08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 1
+  m_Area: 1
+  m_IgnoreFromBuild: 0
+  m_AffectedAgents: ffffffff

@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 9206199681898988393}
   - component: {fileID: 2826702037229015220}
-  - component: {fileID: 7497574632592220535}
   - component: {fileID: -7139596326982761944}
+  - component: {fileID: 7497574632592220535}
   m_Layer: 0
   m_Name: EnemyPrefab
   m_TagString: Untagged
@@ -86,6 +86,31 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &-7139596326982761944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7098198810135709138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41eced7e1352c4d42ad1ed198f05f354, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  areaColli: {fileID: 0}
+  enemyData:
+    name: 
+    battleData:
+      atk: 0
+      atkspd: 0
+      movspd: 0
+      range: 0
+      vision: 0
+    hp:
+      now: 0
+      max: 0
+  state: 0
 --- !u!195 &7497574632592220535
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -108,29 +133,3 @@ NavMeshAgent:
   m_BaseOffset: 0.5
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &-7139596326982761944
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7098198810135709138}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41eced7e1352c4d42ad1ed198f05f354, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  areaColli: {fileID: 0}
-  charaData:
-    atk: 0
-    matk: 0
-    def: 0
-    mdef: 0
-    cri: 0
-    cridmg: 0
-    atkspd: 0
-    movspd: 0
-    skillspd: 0
-    dodge: 0
-    rng: 0
-    vamp: 0

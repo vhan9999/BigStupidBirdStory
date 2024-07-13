@@ -6,21 +6,22 @@ namespace Player.save
     public struct BattleData //basic (class and level)
     {
         public float atk;
-        public float matk;
+        //public float matk;
 
-        public float def;
-        public float mdef;
+        //public float def;
+        //public float mdef;
 
-        public float cri;
-        public float cridmg;
+        //public float cri;
+        //public float cridmg;
 
         public float atkspd;
         public float movspd;
-        public float skillspd;
+        //public float skillspd;
 
-        public float dodge;
+        //public float dodge;
         public float range;
         //public float vamp;
+        public float vision;
     }
 
 }

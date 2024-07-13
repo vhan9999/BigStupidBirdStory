@@ -32,7 +32,7 @@ public class UIManager : MonoBehaviour
             }
             {
                 var go = Instantiate(charaPrefab, charaContainer.transform);
-                go.GetComponent<CharaBehavier>().SetCharaData(data);
+                go.GetComponent<CharaBehaviour>().SetCharaData(data);
                 go.transform.position = new Vector3(tmp, 0, 0);
                 tmp += 2;
             }
@@ -53,10 +53,7 @@ public class UIManager : MonoBehaviour
             battleData = new BattleData
             {
                 atk = 10,
-                def = 10,
-                cri = 10,
                 movspd = 1,
-                dodge = 10
             },
             energy = new MaxableNumber
             {
@@ -85,10 +82,7 @@ public class UIManager : MonoBehaviour
             battleData = new BattleData
             {
                 atk = 20,
-                def = 20,
-                cri = 20,
                 movspd = 1,
-                dodge = 20
             },
             energy = new MaxableNumber
             {

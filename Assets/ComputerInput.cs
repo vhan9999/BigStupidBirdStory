@@ -5,14 +5,17 @@ namespace DefaultNamespace
 {
     public class ComputerInput : MonoBehaviour, IInput
     {
-        private readonly float clickDuration = 0.5f;
+        private readonly float clickDuration = 0.1f;
         private bool clicking;
+        private bool moved;
         private Vector2 oldMousePosition;
         private UnityAction<Vector2> onClick;
         private UnityAction<Vector2> onLongPress;
         private UnityAction<Vector2> onMove;
 
         private float totalDownTime;
+
+        private static float moveOffset => 0.1f;
 
         private void Update()
         {
@@ -21,7 +24,8 @@ namespace DefaultNamespace
             {
                 totalDownTime = 0;
                 clicking = true;
-                oldMousePosition = Input.mousePosition;
+                oldMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                moved = false;
             }
 
             // If a first click detected, and still clicking,
@@ -29,24 +33,35 @@ namespace DefaultNamespace
             // if we exceed the duration specified
             if (clicking && Input.GetMouseButton(0))
             {
-                totalDownTime += Time.deltaTime;
                 Vector2 mousePosition = Input.mousePosition;
-                onMove.Invoke(mousePosition - oldMousePosition);
-                oldMousePosition = mousePosition;
-
-                if (totalDownTime >= clickDuration)
+                Vector2 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
+                totalDownTime += Time.deltaTime;
+                if (totalDownTime >= clickDuration && clicking && !moved)
                 {
-                    Debug.Log("Long click");
                     clicking = false;
-                    onLongPress.Invoke(Input.mousePosition);
+                    onLongPress?.Invoke(worldPosition);
                 }
+
+                if (Vector2.Distance(worldPosition, oldMousePosition) > moveOffset)
+                {
+                    var delta = worldPosition - oldMousePosition;
+                    onMove?.Invoke(delta);
+                    moved = true;
+                }
+
+                oldMousePosition = worldPosition;
             }
 
             // If a first click detected, and we release before the
             // duraction, do nothing, just cancel the click
             if (clicking && Input.GetMouseButtonUp(0))
             {
-                onClick.Invoke(Input.mousePosition);
+                if (clicking && totalDownTime < clickDuration)
+                {
+                    Vector2 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    onClick?.Invoke(worldPosition);
+                }
+
                 clicking = false;
             }
         }

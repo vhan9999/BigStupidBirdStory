@@ -11,8 +11,10 @@ namespace DefaultNamespace
         private bool clicking;
 
         private UnityAction<Vector2> onClick;
+        private UnityAction<Vector2> onEndTouch;
         private UnityAction<Vector2> onLongPress;
-        private UnityAction<Vector2> onMove;
+        private UnityAction<Vector2, Vector2> onMove;
+        private UnityAction<Vector2> onStartTouch;
         private float totalDownTime;
 
         private void Update()
@@ -27,13 +29,14 @@ namespace DefaultNamespace
                         clicking = true;
                         totalDownTime = 0;
                         // moved = false;
+                        onStartTouch?.Invoke(worldPosition);
                         break;
                     case TouchPhase.Moved:
                         var delta = touch.deltaPosition;
                         var deltaWorldPosition =
                             worldPosition - (Vector2)Camera.main.ScreenToWorldPoint(touch.position - delta);
 
-                        onMove?.Invoke(deltaWorldPosition);
+                        onMove?.Invoke(worldPosition, deltaWorldPosition);
 
                         break;
                     case TouchPhase.Stationary:
@@ -47,6 +50,7 @@ namespace DefaultNamespace
                         break;
                     case TouchPhase.Ended:
                     case TouchPhase.Canceled:
+                        onEndTouch?.Invoke(worldPosition);
                         if (clicking && totalDownTime < clickDuration) onClick?.Invoke(worldPosition);
                         break;
                     default:
@@ -57,9 +61,19 @@ namespace DefaultNamespace
 
         #region Subscribe
 
-        public void AddOnMove(UnityAction<Vector2> newOnMove)
+        public void AddOnMove(UnityAction<Vector2, Vector2> newOnMove)
         {
             onMove += newOnMove;
+        }
+
+        public void AddStartTouch(UnityAction<Vector2> newOnStartTouch)
+        {
+            onStartTouch += newOnStartTouch;
+        }
+
+        public void AddEndTouch(UnityAction<Vector2> newOnEndTouch)
+        {
+            onEndTouch += newOnEndTouch;
         }
 
         public void AddOnClick(UnityAction<Vector2> newOnClick)

@@ -16,7 +16,7 @@ public class BuildingOBJ : ClickableOBJ
     public GameObject editGrid;
 
     public LayerMask layerMask;
-    private ContactFilter2D contactFilter;//filter layers
+    private ContactFilter2D contactFilter; //filter layers
     private PolygonCollider2D editGridCollider;
     private SpriteRenderer editGridSprite;
 
@@ -49,10 +49,24 @@ public class BuildingOBJ : ClickableOBJ
     {
         var results = new Collider2D[10];
         var count = editGridCollider.OverlapCollider(contactFilter, results);
-        if (count != 1)
-        {
-            return true;
-        }
+        if (count != 1) return true;
         return false;
+    }
+
+    public void SetHoverPosition(Vector2 position)
+    {
+        transform.position = new Vector3(position.x, position.y, -5);
+        editGrid.transform.position = new Vector3(
+            transform.position.x, transform.position.y, -4.99999f);
+    }
+
+    public void SetNormalPosition()
+    {
+        transform.position =
+            new Vector3(transform.position.x, transform.position.y,
+                transform.position.y + 0.25f * width);
+
+        editGrid.transform.position = new Vector3(
+            transform.position.x, transform.position.y, 100f);
     }
 }

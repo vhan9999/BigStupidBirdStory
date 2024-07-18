@@ -5,17 +5,19 @@ namespace DefaultNamespace
 {
     public class ComputerInput : MonoBehaviour, IInput
     {
-        private readonly float clickDuration = 0.1f;
+        private readonly float clickDuration = 0.5f;
         private bool clicking;
         private bool moved;
         private Vector2 oldMousePosition;
         private UnityAction<Vector2> onClick;
+        private UnityAction<Vector2> onEndTouch;
         private UnityAction<Vector2> onLongPress;
-        private UnityAction<Vector2> onMove;
+        private UnityAction<Vector2, Vector2> onMove;
+        private UnityAction<Vector2> onStartTouch;
 
         private float totalDownTime;
 
-        private static float moveOffset => 0.1f;
+        private static float moveOffset => 0.01f;
 
         private void Update()
         {
@@ -24,8 +26,10 @@ namespace DefaultNamespace
             {
                 totalDownTime = 0;
                 clicking = true;
-                oldMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                var worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                oldMousePosition = worldPosition;
                 moved = false;
+                onStartTouch?.Invoke(worldPosition);
             }
 
             // If a first click detected, and still clicking,
@@ -45,7 +49,7 @@ namespace DefaultNamespace
                 if (Vector2.Distance(worldPosition, oldMousePosition) > moveOffset)
                 {
                     var delta = worldPosition - oldMousePosition;
-                    onMove?.Invoke(delta);
+                    onMove?.Invoke(worldPosition, delta);
                     moved = true;
                 }
 
@@ -56,11 +60,9 @@ namespace DefaultNamespace
             // duraction, do nothing, just cancel the click
             if (clicking && Input.GetMouseButtonUp(0))
             {
-                if (clicking && totalDownTime < clickDuration)
-                {
-                    Vector2 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                    onClick?.Invoke(worldPosition);
-                }
+                var worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                onEndTouch?.Invoke(worldPosition);
+                if (clicking && totalDownTime < clickDuration) onClick?.Invoke(worldPosition);
 
                 clicking = false;
             }
@@ -79,9 +81,19 @@ namespace DefaultNamespace
             onLongPress += newOnLongPress;
         }
 
-        public void AddOnMove(UnityAction<Vector2> newOnMove)
+        public void AddOnMove(UnityAction<Vector2, Vector2> newOnMove)
         {
             onMove += newOnMove;
+        }
+
+        public void AddStartTouch(UnityAction<Vector2> newOnStartTouch)
+        {
+            onStartTouch += newOnStartTouch;
+        }
+
+        public void AddEndTouch(UnityAction<Vector2> newOnEndTouch)
+        {
+            onEndTouch += newOnEndTouch;
         }
 
         #endregion

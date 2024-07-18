@@ -9,7 +9,7 @@ internal enum ControlState
     Edit
 }
 
-public class TouchManage : MonoBehaviour
+public class TouchManage : MonoBehaviour, ILongPressable, IClickable, IEndTouch, IStartTouch, IMoveable
 {
     public GameObject buildingPrefab;
     public GameObject buildingContainer;

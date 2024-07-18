@@ -22,11 +22,11 @@ namespace DefaultNamespace
                 surface2D.UpdateNavMesh(surface2D.navMeshData)
             );
 
-            input.AddOnClick(touchManage.OnClick);
-            input.AddOnMove(touchManage.OnMove);
-            input.AddOnLongPress(touchManage.OnLongPress);
-            input.AddStartTouch(touchManage.OnStartTouch);
-            input.AddEndTouch(touchManage.OnEndTouch);
+            input.AddOnClick(touchManage);
+            input.AddOnMove(touchManage);
+            input.AddOnLongPress(touchManage);
+            input.AddStartTouch(touchManage);
+            input.AddEndTouch(touchManage);
         }
 
         private void Update()

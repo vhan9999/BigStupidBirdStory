@@ -70,30 +70,29 @@ namespace DefaultNamespace
 
         #region Subscribe
 
-        public void AddOnClick(UnityAction<Vector2> newOnClick)
+        public void AddOnClick(IClickable clickable)
         {
-            onClick += newOnClick;
+            onClick += clickable.OnClick;
         }
 
-
-        public void AddOnLongPress(UnityAction<Vector2> newOnLongPress)
+        public void AddOnLongPress(ILongPressable newOnLongPress)
         {
-            onLongPress += newOnLongPress;
+            onLongPress += newOnLongPress.OnLongPress;
         }
 
-        public void AddOnMove(UnityAction<Vector2, Vector2> newOnMove)
+        public void AddOnMove(IMoveable moveable)
         {
-            onMove += newOnMove;
+            onMove += moveable.OnMove;
         }
 
-        public void AddStartTouch(UnityAction<Vector2> newOnStartTouch)
+        public void AddStartTouch(IStartTouch startTouch)
         {
-            onStartTouch += newOnStartTouch;
+            onStartTouch += startTouch.OnStartTouch;
         }
 
-        public void AddEndTouch(UnityAction<Vector2> newOnEndTouch)
+        public void AddEndTouch(IEndTouch endTouch)
         {
-            onEndTouch += newOnEndTouch;
+            onEndTouch += endTouch.OnEndTouch;
         }
 
         #endregion

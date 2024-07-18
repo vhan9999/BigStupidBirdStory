@@ -32,8 +32,10 @@ public class CharaBehaviour : MonoBehaviour
 
     public Transform trans;
 
-    private GameObject target = null;
+    public EnemyBehaviour target = null;
     private bool isAllowAttack = true;
+
+    public TeamBehavier team;
 
     private void Start()
     {
@@ -42,8 +44,8 @@ public class CharaBehaviour : MonoBehaviour
             name = "Chara1",
             battleData = new BattleData
             {
-                atk = 10,
-                atkspd = 10,
+                atk = 1,
+                atkspd = 5,
                 movspd = 1,
                 range = 0.1f,
                 vision = 1
@@ -76,7 +78,11 @@ public class CharaBehaviour : MonoBehaviour
 
     private void Update()
     {
-        if (target != null)
+        if (charaData.hp.now <= 0)
+        {
+            SetState(CharaState.Die);
+        }
+        else if (target != null)
         {
             if (AtkRange())
             {
@@ -91,11 +97,8 @@ public class CharaBehaviour : MonoBehaviour
         }
 
 
-        if (charaData.hp.now <= 0)
-        {
-            SetState(CharaState.Die);
-        }
-        else if (state == CharaState.Idle)
+        
+        if (state == CharaState.Idle)
         {
             if (agent.velocity != Vector3.zero)
             {
@@ -116,7 +119,7 @@ public class CharaBehaviour : MonoBehaviour
         {
             if (isAllowAttack)
             {
-                target.GetComponent<CharaBehaviour>().getDamage(charaData.battleData.atk);
+                target.getDamage(charaData.battleData.atk);
                 isAllowAttack = false;
                 Invoke("AttackCooldown", charaData.battleData.atkspd);
             }
@@ -151,23 +154,6 @@ public class CharaBehaviour : MonoBehaviour
     public void ToMovePoint()
     {
         SetWalkTo(new Vector2(-5.2f, -3.65f));
-    }
-
-    private void Vision()//see chara
-    {
-        foreach (CharaBehaviour chara in CharaManage.CharaList)//TODO enemy list
-        {
-            if (GridManage.CalculateOval(chara.transform.position - transform.position)
-                * Vector2.Distance(chara.transform.position, transform.position)
-                < charaData.battleData.vision
-                && target == null)
-            {
-                CancelInvoke("GoRandomPos");
-                target = chara.gameObject;
-                break;
-                //TODO: cal hatred
-            }
-        }
     }
 
     private bool AtkRange()

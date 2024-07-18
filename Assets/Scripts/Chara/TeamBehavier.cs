@@ -1,10 +1,13 @@
 using Enemy.save;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+using static UnityEngine.EventSystems.EventTrigger;
 using static UnityEngine.GraphicsBuffer;
 
-internal enum TeamState
+public enum TeamState
 {
     InVillage,
     Advanture,
@@ -13,80 +16,104 @@ internal enum TeamState
 public class TeamBehavier : MonoBehaviour
 {
     public List<CharaBehaviour> memberList = new List<CharaBehaviour>();
-    public List<EnemyBehaviour> enemyList = new List<EnemyBehaviour>();
     public GameObject area;
     
-    public int DeadCount = 0;
+    
 
     [SerializeField] private float vision = 1;
+    private float speed = 1;
+    private NavMeshAgent agent;
     private PolygonCollider2D areaColli;
     private EnemySpawnManage areaEnemys;
-    private TeamState state;
-    private GameObject target;
+    [SerializeField] private TeamState state;
+    [SerializeField] private bool isRandomWalk = false;
+    [SerializeField] public EnemyBehaviour target;
+    [SerializeField] public BattleManage battleManager;
     // Start is called before the first frame update
     void Start()
     {
-        state = TeamState.InVillage;
+        SetArea(area);
+        battleManager = transform.GetComponent<BattleManage>();
+        state = TeamState.Advanture;
+        agent = transform.GetComponent<NavMeshAgent>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        
         if(state == TeamState.InVillage) 
         {
 
         }
         else if (state == TeamState.Advanture) 
         {
+            if(agent.velocity != Vector3.zero)
+                agent.speed = speed * GridManage.CalculateOval(agent.velocity);
+            
+
+            if (!isTogether())
+            {
+                foreach (CharaBehaviour chara in memberList)
+                    chara.agent.SetDestination(transform.position);
+            }
+            else if (TouchArea(transform.position, areaColli))
+            {
+                if (!isRandomWalk)
+                {
+                    GoRandomPos();
+                    isRandomWalk = true;
+                }
+                    
+            }
+            else
+            {
+                agent.SetDestination(new Vector2(-6.04f, -3.21f));
+            }
             Vision();
-            //not in area: go area
-            //random walk
         }
         else if (state == TeamState.Battle)
         {
-            if(enemyList.Count == 0)
-            {
-                state = TeamState.Advanture;
-            }
-            if(DeadCount == memberList.Count)
-            {
-                state = TeamState.InVillage;
-            }
+            battleManager.battleUpdate();
         }
     }
 
+    public void SetState(TeamState state)
+    {
+        this.state = state;
+        switch (state)
+        {
+            case TeamState.InVillage:
+                break;
+            case TeamState.Advanture:
+                break;
+            case TeamState.Battle:
+                CancelInvoke("GoRandomPos");
+                break;
+        }
+    }
     public void AddMember(CharaBehaviour member)
     {
         memberList.Add(member);
     }
-    public void AddEnemy(EnemyBehaviour enemy)
-    {
-        if(!enemyList.Contains(enemy))
-            enemyList.Add(enemy);
-    }
+
     public void DeleteMember(CharaBehaviour member)
     {
         memberList.Remove(member);
-    }
-    public void DeleteEnemy(EnemyBehaviour enemy)
-    {
-        enemyList.Remove(enemy);
-        if(enemyList.Count > 0)
-            target = enemyList[0].gameObject;
     }
 
     private void Vision()//see enemy
     {
         foreach (EnemyBehaviour enemy in areaEnemys.enemyList)
         {
+            
             if (GridManage.CalculateOval(enemy.transform.position - transform.position)
                 * Vector2.Distance(enemy.transform.position, transform.position)
                 < vision
                 && target == null)
             {
-                CancelInvoke("GoRandomPos");
-                target = enemy.gameObject;
-                AddEnemy(enemy);
+                SetTarget(enemy);
+                battleManager.AddEnemy(enemy);
                 state = TeamState.Battle;
                 break;
             }
@@ -98,5 +125,55 @@ public class TeamBehavier : MonoBehaviour
         area = a;
         areaColli = area.GetComponent<PolygonCollider2D>();
         areaEnemys = area.transform.GetChild(0).GetComponent<EnemySpawnManage>();
+    }
+
+    private void GoRandomPos()//walk around
+    {
+        while (true)
+        {
+            Vector2 randomPos = new Vector2(
+                transform.position.x + ((UnityEngine.Random.Range(0, 1) * 2 - 1) * UnityEngine.Random.Range(2f, 5f)),
+                transform.position.y + ((UnityEngine.Random.Range(0, 1) * 2 - 1) * UnityEngine.Random.Range(2f, 5f))
+                );
+            if (TouchArea(randomPos, areaColli))
+            {
+                foreach(CharaBehaviour chara in memberList)
+                {
+                    chara.agent.SetDestination(randomPos);
+                }
+                agent.SetDestination(randomPos);
+                break;
+            }
+        }
+        float waitTime = UnityEngine.Random.Range(6f, 20f);
+        Invoke("GoRandomPos", waitTime);
+    }
+
+    private bool TouchArea(Vector2 position, PolygonCollider2D areaCollider)//whether touch area
+    {
+        if (areaCollider.OverlapPoint(position))
+            return true;
+        return false;
+    }
+
+    private bool isTogether()
+    {
+        foreach(CharaBehaviour chara in memberList)
+        {
+            if(GridManage.CalculateOval(chara.transform.position - transform.position)
+                * Vector2.Distance(chara.transform.position, transform.position)
+                >= 0.1f)
+                return false;
+        }
+        return true;
+    }
+
+    public void SetTarget(EnemyBehaviour enemy)
+    {
+        target = enemy;
+        foreach(CharaBehaviour chara in memberList)
+        {
+            chara.target = target;
+        }
     }
 }

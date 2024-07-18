@@ -6,7 +6,7 @@ public class EnemySpawnManage : MonoBehaviour
 { 
     private List<GameObject> spawnPointList = new List<GameObject>();
     public List<EnemyBehaviour> enemyList = new List<EnemyBehaviour>();
-    private int maxCount = 15;
+    private int maxCount = 35;
     [SerializeField] private EnemyBehaviour enemyPrefab;
     [SerializeField] private GameObject enemyParent;
     // Start is called before the first frame update
@@ -24,7 +24,7 @@ public class EnemySpawnManage : MonoBehaviour
         int randomPoint = Random.Range(0, spawnPointList.Count);
         Vector2 randomPos = new Vector2(spawnPointList[randomPoint].transform.position.x + Random.Range(-3f,3f), spawnPointList[randomPoint].transform.position.y + Random.Range(-3f, 3f));
         EnemyBehaviour enemy = Instantiate(enemyPrefab, randomPos, transform.rotation);
-        enemy.transform.parent = enemyParent.transform;
+        enemy.transform.SetParent(enemyParent.transform);
         enemy.areaColli = transform.parent.GetComponent<PolygonCollider2D>();
         enemyList.Add(enemy);
     }

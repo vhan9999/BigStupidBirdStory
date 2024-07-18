@@ -1,25 +1,22 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public class BattleManage : MonoBehaviour
 {
-    public List<EnemyBehaviour> enemyList = new List<EnemyBehaviour>();
+    public List<EnemyBehaviour> enemyList = new();
     public TeamBehavier teamBehavier;
-    public int CharaDeadCount = 0;
+
+    public int CharaDeadCount;
+
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         teamBehavier = transform.GetComponent<TeamBehavier>();
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        
     }
 
     public void AddEnemy(EnemyBehaviour enemy)
@@ -31,20 +28,20 @@ public class BattleManage : MonoBehaviour
     public void DeleteEnemy(EnemyBehaviour enemy)
     {
         enemyList.Remove(enemy);
-        if (enemyList.Count > 0)
-            teamBehavier.SetTarget(enemyList[0]);
+        // if (enemyList.Count > 0)
+        //     teamBehavier.SetTarget(enemyList[0]);
     }
-    
+
     public void battleUpdate()
     {
         if (enemyList.Count == 0)
         {
-            teamBehavier.SetState(TeamState.Advanture);
+            // teamBehavier.SetState(TeamState.Advanture);
         }
-        if (CharaDeadCount == teamBehavier.memberList.Count)
-        {
-            teamBehavier.SetState(TeamState.InVillage);
-            //call alter to get pos
-        }
+        // if (CharaDeadCount == teamBehavier.memberList.Count)
+        // {
+        //     teamBehavier.SetState(TeamState.InVillage);
+        //     //call alter to get pos
+        // }
     }
 }

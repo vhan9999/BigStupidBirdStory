@@ -19,7 +19,6 @@ public class EnemyBehaviour : MonoBehaviour
     private NavMeshAgent agent;
     [SerializeField] private EnemyData enemyData;
     [SerializeField] private EnemyState state;
-    private GameObject target = null;
     private CharaBehaviour targetChara = null;
     private bool isAllowAttack = true;
     private Dictionary<GameObject, int> hateList = new Dictionary<GameObject, int>();
@@ -36,7 +35,7 @@ public class EnemyBehaviour : MonoBehaviour
             battleData = new BattleData
             {
                 atk = 10,
-                atkspd = 10,
+                atkspd = 5,
                 movspd = 1,
                 range = 0.1f,
                 vision = 1
@@ -54,7 +53,7 @@ public class EnemyBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (target != null)
+        if (targetChara != null)
         {
             if (AtkRange())
             {
@@ -63,7 +62,7 @@ public class EnemyBehaviour : MonoBehaviour
             }
             else
             {
-                agent.SetDestination(target.transform.position);
+                agent.SetDestination(targetChara.transform.position);
                 SetState(EnemyState.Walk);
             }
         }
@@ -100,7 +99,7 @@ public class EnemyBehaviour : MonoBehaviour
                 targetChara.getDamage(enemyData.battleData.atk);
                 if(targetChara.charaData.hp.now <= 0)
                 {
-                    target = null;
+                    targetChara = null;
                     SetState(EnemyState.Walk);
 
                 }
@@ -157,10 +156,11 @@ public class EnemyBehaviour : MonoBehaviour
             if (GridManage.CalculateOval(chara.transform.position - transform.position)
                 * Vector2.Distance(chara.transform.position, transform.position)
                 < enemyData.battleData.vision
-                && target == null)
+                && targetChara == null)
             {
                 CancelInvoke("GoRandomPos");
-                target = chara.gameObject;
+                targetChara = chara;
+                chara.team.battleManager.AddEnemy(this);
                 break;
                 //TODO: cal hatred
             }
@@ -169,8 +169,8 @@ public class EnemyBehaviour : MonoBehaviour
 
     private bool AtkRange()
     {
-        if (GridManage.CalculateOval(target.transform.position - transform.position)
-            * Vector2.Distance(target.transform.position, transform.position)
+        if (GridManage.CalculateOval(targetChara.transform.position - transform.position)
+            * Vector2.Distance(targetChara.transform.position, transform.position)
             < enemyData.battleData.range)
             return true;
         else

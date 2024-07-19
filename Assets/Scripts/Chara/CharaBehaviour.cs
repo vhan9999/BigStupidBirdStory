@@ -1,9 +1,6 @@
-using Enemy.save;
 using Player.save;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using static UnityEngine.GraphicsBuffer;
 
 internal enum CharaState
 {
@@ -14,6 +11,7 @@ internal enum CharaState
 
     // Run,
     Attack,
+
     // Skill,
     Die
 }
@@ -32,10 +30,10 @@ public class CharaBehaviour : MonoBehaviour
 
     public Transform trans;
 
-    public EnemyBehaviour target = null;
-    private bool isAllowAttack = true;
+    public EnemyBehaviour target;
 
     public TeamBehavier team;
+    private bool isAllowAttack = true;
 
     private void Start()
     {
@@ -78,52 +76,56 @@ public class CharaBehaviour : MonoBehaviour
 
     private void Update()
     {
-        if (charaData.hp.now <= 0)
-        {
-            SetState(CharaState.Die);
-        }
-        else if (target != null)
-        {
-            if (AtkRange())
-            {
-                agent.SetDestination(transform.position);
-                SetState(CharaState.Attack);
-            }
-            else
-            {
-                agent.SetDestination(target.transform.position);
-                SetState(CharaState.Walk);
-            }
-        }
+        // if (charaData.hp.now <= 0)
+        // {
+        //     SetState(CharaState.Die);
+        // }
+        // else if (target != null)
+        // {
+        //     if (AtkRange())
+        //     {
+        //         agent.SetDestination(transform.position);
+        //         SetState(CharaState.Attack);
+        //     }
+        //     else
+        //     {
+        //         agent.SetDestination(target.transform.position);
+        //         SetState(CharaState.Walk);
+        //     }
+        // }
+        //
+        //
+        //
+        // if (state == CharaState.Idle)
+        // {
+        //     if (agent.velocity != Vector3.zero)
+        //     {
+        //         SetState(CharaState.Walk);
+        //     }
+        // }
+        // else if (state == CharaState.Walk)
+        // {
+        //     if (agent.velocity != Vector3.zero)
+        //         agent.speed = charaData.battleData.movspd * GridManage.CalculateOval(agent.velocity);
+        //     else
+        //     {
+        //         SetState(CharaState.Idle);
+        //     }
+        //
+        // }
+        // else if (state == CharaState.Attack)
+        // {
+        //     if (isAllowAttack)
+        //     {
+        //         target.getDamage(charaData.battleData.atk);
+        //         isAllowAttack = false;
+        //         Invoke("AttackCooldown", charaData.battleData.atkspd);
+        //     }
+        // }
+    }
 
-
-        
-        if (state == CharaState.Idle)
-        {
-            if (agent.velocity != Vector3.zero)
-            {
-                SetState(CharaState.Walk);
-            }
-        }
-        else if (state == CharaState.Walk)
-        {
-            if (agent.velocity != Vector3.zero)
-                agent.speed = charaData.battleData.movspd * GridManage.CalculateOval(agent.velocity);
-            else
-            {
-                SetState(CharaState.Idle);
-            }
-
-        }
-        else if (state == CharaState.Attack)
-        {
-            if (isAllowAttack)
-            {
-                target.getDamage(charaData.battleData.atk);
-                isAllowAttack = false;
-                Invoke("AttackCooldown", charaData.battleData.atkspd);
-            }
-        }
+    private void UpdateInVillage()
+    {
     }
 
     public void SetWalkTo(Vector2 pos)
@@ -153,17 +155,16 @@ public class CharaBehaviour : MonoBehaviour
 
     public void ToMovePoint()
     {
-        SetWalkTo(new Vector2(-5.2f, -3.65f));
+        // SetWalkTo(new Vector2(-5.2f, -3.65f));
     }
 
     private bool AtkRange()
     {
         if (GridManage.CalculateOval(target.transform.position - transform.position)
-                * Vector2.Distance(target.transform.position, transform.position)
-                < charaData.battleData.range)
+            * Vector2.Distance(target.transform.position, transform.position)
+            < charaData.battleData.range)
             return true;
-        else
-            return false;
+        return false;
     }
 
     private void AttackCooldown()

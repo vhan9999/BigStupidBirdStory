@@ -94,7 +94,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9206199681898988393}
   - component: {fileID: 1700686252292069718}
-  - component: {fileID: 7497574632592220535}
+  - component: {fileID: 4555054733867003904}
   m_Layer: 7
   m_Name: CharaPrefab
   m_TagString: Untagged
@@ -153,11 +153,11 @@ MonoBehaviour:
   state: 0
   walkTarget: {x: 0, y: 0}
   attackTarget: {fileID: 0}
-  agent: {fileID: 7497574632592220535}
+  agent: {fileID: 4555054733867003904}
   trans: {fileID: 0}
   target: {fileID: 0}
   team: {fileID: 0}
---- !u!195 &7497574632592220535
+--- !u!195 &4555054733867003904
 NavMeshAgent:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -166,16 +166,16 @@ NavMeshAgent:
   m_GameObject: {fileID: 7098198810135709138}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.1
-  m_Speed: 3.5
-  m_Acceleration: 100
+  m_Radius: 0.5
+  m_Speed: 10
+  m_Acceleration: 8
   avoidancePriority: 50
-  m_AngularSpeed: 100
+  m_AngularSpeed: 0
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 0.2
-  m_BaseOffset: 0.5
-  m_WalkableMask: 1
+  m_Height: 1
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4

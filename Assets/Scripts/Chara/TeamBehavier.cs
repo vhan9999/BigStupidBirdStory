@@ -27,9 +27,9 @@ public class TeamBehavier : MonoBehaviour
             case TeamState.InVillage:
                 if (Input.GetKeyDown(KeyCode.A)) charaBehaviour.SetWalkTo(transform.position);
 
-                if (Vector2.Distance(transform.position, charaBehaviour.transform.position) <
-                    0.1f) // TODO: need to use oval distance
-                    state = TeamState.Advanture;
+                //if (Vector2.Distance(transform.position, charaBehaviour.transform.position) <
+                //    0.1f) // TODO: need to use oval distance
+                //    state = TeamState.Advanture;
                 break;
             case TeamState.Advanture:
                 if (Input.GetKeyDown(KeyCode.B)) state = TeamState.Battle;
@@ -46,7 +46,7 @@ public class TeamBehavier : MonoBehaviour
 
     private void SetWalkTo(Vector2 pos)
     {
-        // charaBehaviour.SetWalkTo(pos);
+        charaBehaviour.SetWalkTo(pos);
     }
 
     #region old

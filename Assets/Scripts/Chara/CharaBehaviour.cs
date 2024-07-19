@@ -24,7 +24,7 @@ public class CharaBehaviour : MonoBehaviour
 
     [SerializeField] private CharaState state;
 
-    [SerializeField] private Vector2 walkTarget;
+    public Dictionary<Item,int> bag = new Dictionary<Item, int>();
 
     public GameObject attackTarget;
 
@@ -128,7 +128,6 @@ public class CharaBehaviour : MonoBehaviour
 
     public void SetWalkTo(Vector2 pos)
     {
-        walkTarget = pos;
         agent.SetDestination(pos);
     }
 

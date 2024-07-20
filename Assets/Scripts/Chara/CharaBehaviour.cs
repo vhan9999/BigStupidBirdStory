@@ -38,7 +38,6 @@ public class CharaBehaviour : MonoBehaviour
     [SerializeField] private CharaInTeamState inTeamState;
     [SerializeField] private CharaInVillageState inVillageState;
     [SerializeField] private CharaState state;
-    public Dictionary<Item,int> bag = new Dictionary<Item, int>();
 
     public GameObject attackTarget;
 
@@ -49,6 +48,7 @@ public class CharaBehaviour : MonoBehaviour
     public EnemyBehaviour target;
 
     public TeamBehavier team;
+    public Dictionary<Item, int> bag = new();
     private bool isAllowAttack = true;
 
     private void Start()

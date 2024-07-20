@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 internal enum ControlState
 {
@@ -16,6 +17,7 @@ public class TouchManage : MonoBehaviour, ILongPressable, IClickable, IEndTouch,
     public List<BuildingOBJ> buildingList = new();
     [SerializeField] private BuildingOBJ movingGameObject;
     [SerializeField] private bool isMovingBuilding;
+    [SerializeField] private GameObject EditEndButton;
     private ControlState controlState;
 
     private BuildingOBJ flagGameObject;
@@ -90,7 +92,9 @@ public class TouchManage : MonoBehaviour, ILongPressable, IClickable, IEndTouch,
         startPoint = movingGameObject.transform.position;
         controlState = ControlState.Edit;
         buildingList.Add(bobj);
+        EditEndButton.SetActive(true);
     }
+
 
     public void UpdateNavMesh()
     {
@@ -108,6 +112,7 @@ public class TouchManage : MonoBehaviour, ILongPressable, IClickable, IEndTouch,
             movingGameObject = null;
             UpdateNavMesh(); // maybe need Invoke("UpdateNavMesh", 0.02f);
             controlState = ControlState.Normal;
+            EditEndButton.SetActive(false);
         }
     }
 
@@ -122,7 +127,9 @@ public class TouchManage : MonoBehaviour, ILongPressable, IClickable, IEndTouch,
             {
                 controlState = ControlState.Edit;
                 tb.SetColor(BuildingOBJ.EditState.NoOverlapping);
+                movingGameObject = tb;
             }
+            EditEndButton.SetActive(true);
         }
     }
 
@@ -157,7 +164,7 @@ public class TouchManage : MonoBehaviour, ILongPressable, IClickable, IEndTouch,
         if (isMovingBuilding) //movingGameObject.transform.position = position;
         {
             var realMovePos = GridManage.RealToGridToReal(position.x, position.y);
-            movingGameObject.SetHoverPosition(realMovePos);
+            movingGameObject.SetHoverPosition(realMovePos); 
             if (movingGameObject.IsOverlapping())
                 movingGameObject.SetColor(BuildingOBJ.EditState.Overlapping);
             else

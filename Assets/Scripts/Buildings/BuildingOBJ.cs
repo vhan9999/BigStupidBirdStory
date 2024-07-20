@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class BuildingOBJ : ClickableOBJ
 {
@@ -15,10 +17,12 @@ public class BuildingOBJ : ClickableOBJ
 
     public GameObject editGrid;
 
+    public List<Vector2> entrys = new List<Vector2>();
     public LayerMask layerMask;
     private ContactFilter2D contactFilter; //filter layers
     private PolygonCollider2D editGridCollider;
     private SpriteRenderer editGridSprite;
+    
 
     private void Awake()
     {
@@ -27,6 +31,7 @@ public class BuildingOBJ : ClickableOBJ
         editGridCollider = editGrid.GetComponent<PolygonCollider2D>();
         editGridSprite = editGrid.GetComponent<SpriteRenderer>();
         SetColor(EditState.Normal);
+        //todo: entrys
     }
 
     public void SetColor(EditState state)

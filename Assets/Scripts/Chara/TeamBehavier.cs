@@ -57,18 +57,44 @@ public class TeamBehavier : MonoBehaviour
                     return;
                 }
 
+
                 // if (Input.GetKeyDown(KeyCode.C)) SetWalkTo(enemyBehaviour.transform.position);
                 var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                if (Input.GetMouseButtonDown(0)) SetWalkTo(pos);
+                if (Input.GetMouseButtonDown(0))
+                {
+                    SetWalkTo(pos);
+                }
+                else
+                {
+                    var enemyList = EnemySpawnManage.GetEnemyList();
+                    float minDistance = 100;
+                    EnemyBehaviour target = null;
+                    foreach (var enemy in enemyList)
+                    {
+                        var distance = Vector2.Distance(enemy.transform.position, charaBehaviour.transform.position);
+                        if (distance < minDistance)
+                        {
+                            minDistance = distance;
+                            target = enemy;
+                        }
+
+                        if (distance < 1)
+                        {
+                            SetState(TeamState.Battle);
+                            break;
+                        }
+                    }
+
+                    if (target != null) charaBehaviour.SetWalkTo(target.transform.position);
+                }
+
                 break;
             case TeamState.BackToVillage:
                 if (Vector2.Distance(charaBehaviour.transform.position, transform.position) < 0.1f)
                     SetState(TeamState.InVillage);
                 break;
             case TeamState.Battle:
-                // TODO: battle
-                // if (Input.GetKeyDown(KeyCode.A)) state = TeamState.Advanture;
-                // SetWalkTo(breakPosition);
+                // wait to battle manage call on battle end
                 break;
             default:
                 throw new ArgumentOutOfRangeException();

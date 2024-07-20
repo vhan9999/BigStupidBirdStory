@@ -31,7 +31,8 @@ namespace DefaultNamespace
             charaBehaviourPrefab = Resources.Load<CharaBehaviour>("Chara/CharaPrefab");
             teamBehavierPrefab = Resources.Load<TeamBehavier>("Chara/TeamPrefab");
 
-            surface2D = GameObject.Find("MapContainer/MapNavMesh").GetComponent<NavMeshSurface>();
+            if (surface2D != null)
+                surface2D = GameObject.Find("MapContainer/MapNavMesh").GetComponent<NavMeshSurface>();
             mountainHole = GameObject.Find("MapContainer/MountainHole");
             buildingContainer = GameObject.Find("BuildingContainer");
             if (buildingContainer == null) buildingContainer = new GameObject("BuildingContainer");

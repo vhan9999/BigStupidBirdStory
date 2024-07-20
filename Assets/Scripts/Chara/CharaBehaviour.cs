@@ -1,8 +1,22 @@
+using System;
 using Player.save;
 using UnityEngine;
 using UnityEngine.AI;
 
 internal enum CharaState
+{
+    InVillage,
+    InTeam
+}
+
+internal enum CharaInVillageState
+{
+    Idle,
+    GoToUnity,
+    Prepared
+}
+
+internal enum CharaInTeamState
 {
     Idle,
     Walk,
@@ -20,8 +34,9 @@ public class CharaBehaviour : MonoBehaviour
 {
     public CharaData charaData;
 
+    [SerializeField] private CharaInTeamState inTeamState;
+    [SerializeField] private CharaInVillageState inVillageState;
     [SerializeField] private CharaState state;
-
     [SerializeField] private Vector2 walkTarget;
 
     public GameObject attackTarget;
@@ -69,13 +84,26 @@ public class CharaBehaviour : MonoBehaviour
                 max = 100
             }
         };
-        state = CharaState.Idle;
+        inTeamState = CharaInTeamState.Idle;
         agent.updateRotation = false;
         agent.updateUpAxis = false;
+        state = CharaState.InVillage;
+        inVillageState = CharaInVillageState.Idle;
     }
 
     private void Update()
     {
+        switch (state)
+        {
+            case CharaState.InVillage:
+                UpdateInVillage();
+                break;
+            case CharaState.InTeam:
+                UpdateInTeam();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
         // if (charaData.hp.now <= 0)
         // {
         //     SetState(CharaState.Die);
@@ -124,8 +152,47 @@ public class CharaBehaviour : MonoBehaviour
         // }
     }
 
+
+    private void UpdateInTeam()
+    {
+    }
+
     private void UpdateInVillage()
     {
+        switch (inVillageState)
+        {
+            case CharaInVillageState.Idle:
+                if (Math.Abs(charaData.hp.now - charaData.hp.max) < 0.1)
+                    SetInViilageState(CharaInVillageState.GoToUnity);
+                break;
+            case CharaInVillageState.GoToUnity:
+                if (agent.speed == 0) SetInViilageState(CharaInVillageState.Prepared);
+                break;
+            case CharaInVillageState.Prepared:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    private void SetInViilageState(CharaInVillageState newState)
+    {
+        switch (newState)
+        {
+            case CharaInVillageState.Idle:
+                break;
+            case CharaInVillageState.GoToUnity:
+                SetWalkTo(team.transform.position);
+                break;
+            case CharaInVillageState.Prepared:
+                team.CharaPrepared();
+                state = CharaState.InTeam;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
+        }
+
+        inVillageState = newState;
     }
 
     public void SetWalkTo(Vector2 pos)
@@ -139,16 +206,16 @@ public class CharaBehaviour : MonoBehaviour
         this.charaData = charaData;
     }
 
-    private void SetState(CharaState state)
+    private void SetState(CharaInTeamState inTeamState)
     {
-        this.state = state;
-        switch (state)
+        this.inTeamState = inTeamState;
+        switch (inTeamState)
         {
-            case CharaState.Idle:
+            case CharaInTeamState.Idle:
                 break;
-            case CharaState.Walk:
+            case CharaInTeamState.Walk:
                 break;
-            case CharaState.Die:
+            case CharaInTeamState.Die:
                 break;
         }
     }

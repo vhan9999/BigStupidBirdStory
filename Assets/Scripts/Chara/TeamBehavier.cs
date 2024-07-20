@@ -19,6 +19,7 @@ public class TeamBehavier : MonoBehaviour
     // private NavMeshAgent agent;
     private Vector2 breakPosition;
     private UnityAction<CharaBehaviour> onBattleStart;
+    private int preparedCount;
 
 
     private void Start()
@@ -140,6 +141,16 @@ public class TeamBehavier : MonoBehaviour
         // agent.SetDestination(pos);
         charaBehaviour.SetWalkTo(pos);
         transform.position = pos;
+    }
+
+    public void CharaPrepared()
+    {
+        preparedCount++;
+        if (preparedCount == 1)
+        {
+            state = TeamState.Advanture;
+            preparedCount = 0;
+        }
     }
 
     #region old

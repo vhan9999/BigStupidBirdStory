@@ -67,7 +67,7 @@ public class EnemyBehaviour : MonoBehaviour
         }
         else
         {
-            Vision();
+            // Vision();
         }
 
         if (enemyData.hp.now <= 0)
@@ -143,21 +143,21 @@ public class EnemyBehaviour : MonoBehaviour
         }
     }
 
-    private void Vision() //see chara
-    {
-        foreach (var chara in CharaManage.CharaList) //TODO enemy list
-            if (GridManage.CalculateOval(chara.transform.position - transform.position)
-                * Vector2.Distance(chara.transform.position, transform.position)
-                < enemyData.battleData.vision
-                && targetChara == null)
-            {
-                CancelInvoke("GoRandomPos");
-                targetChara = chara;
-                // chara.team.battleManager.AddEnemy(this);
-                break;
-                //TODO: cal hatred
-            }
-    }
+    // private void Vision() //see chara
+    // {
+    //     foreach (var chara in CharaManage.CharaList) //TODO enemy list
+    //         if (GridManage.CalculateOval(chara.transform.position - transform.position)
+    //             * Vector2.Distance(chara.transform.position, transform.position)
+    //             < enemyData.battleData.vision
+    //             && targetChara == null)
+    //         {
+    //             CancelInvoke("GoRandomPos");
+    //             targetChara = chara;
+    //             // chara.team.battleManager.AddEnemy(this);
+    //             break;
+    //             //TODO: cal hatred
+    //         }
+    // }
 
     private bool AtkRange()
     {

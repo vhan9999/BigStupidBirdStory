@@ -1,10 +1,12 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 public enum TeamState
 {
     InVillage,
     Advanture,
+    BackToVillage,
     Battle
 }
 
@@ -14,9 +16,20 @@ public class TeamBehavier : MonoBehaviour
     [SerializeField] private CharaBehaviour charaBehaviour;
     [SerializeField] private EnemyBehaviour enemyBehaviour;
 
+    // private NavMeshAgent agent;
+    private Vector2 breakPosition;
+    private UnityAction<CharaBehaviour> onBattleStart;
+    private int preparedCount;
+
+
     private void Start()
     {
         state = TeamState.InVillage;
+        breakPosition = Vector2.zero;
+        // agent = GetComponent<NavMeshAgent>();
+        // if (agent == null) agent = gameObject.AddComponent<NavMeshAgent>();
+        // agent.updateRotation = false;
+        // agent.updateUpAxis = false;
     }
 
     private void Update()
@@ -27,26 +40,117 @@ public class TeamBehavier : MonoBehaviour
             case TeamState.InVillage:
                 if (Input.GetKeyDown(KeyCode.A)) charaBehaviour.SetWalkTo(transform.position);
 
-                //if (Vector2.Distance(transform.position, charaBehaviour.transform.position) <
-                //    0.1f) // TODO: need to use oval distance
-                //    state = TeamState.Advanture;
+                if (Vector2.Distance(transform.position, charaBehaviour.transform.position) <
+                    0.1f) // TODO: need to use oval distance
+                    SetState(TeamState.Advanture);
                 break;
             case TeamState.Advanture:
-                if (Input.GetKeyDown(KeyCode.B)) state = TeamState.Battle;
-                if (Input.GetKeyDown(KeyCode.C)) SetWalkTo(enemyBehaviour.transform.position);
+                if (Input.GetKeyDown(KeyCode.B))
+                {
+                    SetState(state);
+                    return;
+                }
 
+                if (Input.GetKeyDown(KeyCode.C))
+                {
+                    SetState(TeamState.Battle);
+                    // SetWalkTo(breakPosition);
+                    return;
+                }
+
+
+                // if (Input.GetKeyDown(KeyCode.C)) SetWalkTo(enemyBehaviour.transform.position);
+                var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                if (Input.GetMouseButtonDown(0))
+                {
+                    SetWalkTo(pos);
+                }
+                else
+                {
+                    var enemyList = EnemySpawnManage.GetEnemyList();
+                    float minDistance = 100;
+                    EnemyBehaviour target = null;
+                    foreach (var enemy in enemyList)
+                    {
+                        var distance = Vector2.Distance(enemy.transform.position, charaBehaviour.transform.position);
+                        if (distance < minDistance)
+                        {
+                            minDistance = distance;
+                            target = enemy;
+                        }
+
+                        if (distance < 1)
+                        {
+                            SetState(TeamState.Battle);
+                            break;
+                        }
+                    }
+
+                    if (target != null) charaBehaviour.SetWalkTo(target.transform.position);
+                }
 
                 break;
+            case TeamState.BackToVillage:
+                if (Vector2.Distance(charaBehaviour.transform.position, transform.position) < 0.1f)
+                    SetState(TeamState.InVillage);
+                break;
             case TeamState.Battle:
+                // wait to battle manage call on battle end
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
     }
 
+    private void SetState(TeamState newState)
+    {
+        switch (newState)
+        {
+            case TeamState.InVillage:
+                break;
+            case TeamState.Advanture:
+                break;
+            case TeamState.BackToVillage:
+                SetWalkTo(breakPosition);
+                break;
+            case TeamState.Battle:
+                onBattleStart?.Invoke(charaBehaviour);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
+        }
+
+        state = newState;
+    }
+
+    public void AddOnBattleStart(UnityAction<CharaBehaviour> action)
+    {
+        onBattleStart += action;
+    }
+
+    public void OnBattleEnd(bool result)
+    {
+        if (result)
+            SetState(TeamState.Advanture);
+        else
+            SetState(TeamState.BackToVillage);
+    }
+
     private void SetWalkTo(Vector2 pos)
     {
+        // agent.SetDestination(pos);
         charaBehaviour.SetWalkTo(pos);
+        transform.position = pos;
+    }
+
+    public void CharaPrepared()
+    {
+        preparedCount++;
+        if (preparedCount == 1)
+        {
+            state = TeamState.Advanture;
+            preparedCount = 0;
+        }
     }
 
     #region old
@@ -127,10 +231,11 @@ public class TeamBehavier : MonoBehaviour
     //             break;
     //     }
     // }
-    // public void AddMember(CharaBehaviour member)
-    // {
-    //     memberList.Add(member);
-    // }
+    public void AddMember(CharaBehaviour member)
+    {
+        // memberList.Add(member);
+        charaBehaviour = member;
+    }
     //
     // public void DeleteMember(CharaBehaviour member)
     // {

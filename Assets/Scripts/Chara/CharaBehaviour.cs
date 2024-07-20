@@ -1,11 +1,23 @@
-using Enemy.save;
-using Player.save;
+using System;
 using System.Collections.Generic;
+using Player.save;
 using UnityEngine;
 using UnityEngine.AI;
-using static UnityEngine.GraphicsBuffer;
 
 internal enum CharaState
+{
+    InVillage,
+    InTeam
+}
+
+internal enum CharaInVillageState
+{
+    Idle,
+    GoToUnity,
+    Prepared
+}
+
+internal enum CharaInTeamState
 {
     Idle,
     Walk,
@@ -14,6 +26,7 @@ internal enum CharaState
 
     // Run,
     Attack,
+
     // Skill,
     Die
 }
@@ -22,9 +35,9 @@ public class CharaBehaviour : MonoBehaviour
 {
     public CharaData charaData;
 
+    [SerializeField] private CharaInTeamState inTeamState;
+    [SerializeField] private CharaInVillageState inVillageState;
     [SerializeField] private CharaState state;
-
-    public Dictionary<Item,int> bag = new Dictionary<Item, int>();
 
     public GameObject attackTarget;
 
@@ -32,10 +45,11 @@ public class CharaBehaviour : MonoBehaviour
 
     public Transform trans;
 
-    public EnemyBehaviour target = null;
-    private bool isAllowAttack = true;
+    public EnemyBehaviour target;
 
     public TeamBehavier team;
+    public Dictionary<Item, int> bag = new();
+    private bool isAllowAttack = true;
 
     private void Start()
     {
@@ -71,59 +85,115 @@ public class CharaBehaviour : MonoBehaviour
                 max = 100
             }
         };
-        state = CharaState.Idle;
+        inTeamState = CharaInTeamState.Idle;
         agent.updateRotation = false;
         agent.updateUpAxis = false;
+        state = CharaState.InVillage;
+        inVillageState = CharaInVillageState.Idle;
     }
 
     private void Update()
     {
-        if (charaData.hp.now <= 0)
+        switch (state)
         {
-            SetState(CharaState.Die);
+            case CharaState.InVillage:
+                UpdateInVillage();
+                break;
+            case CharaState.InTeam:
+                UpdateInTeam();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
-        else if (target != null)
-        {
-            if (AtkRange())
-            {
-                agent.SetDestination(transform.position);
-                SetState(CharaState.Attack);
-            }
-            else
-            {
-                agent.SetDestination(target.transform.position);
-                SetState(CharaState.Walk);
-            }
-        }
+        // if (charaData.hp.now <= 0)
+        // {
+        //     SetState(CharaState.Die);
+        // }
+        // else if (target != null)
+        // {
+        //     if (AtkRange())
+        //     {
+        //         agent.SetDestination(transform.position);
+        //         SetState(CharaState.Attack);
+        //     }
+        //     else
+        //     {
+        //         agent.SetDestination(target.transform.position);
+        //         SetState(CharaState.Walk);
+        //     }
+        // }
+        //
+        //
+        //
+        // if (state == CharaState.Idle)
+        // {
+        //     if (agent.velocity != Vector3.zero)
+        //     {
+        //         SetState(CharaState.Walk);
+        //     }
+        // }
+        // else if (state == CharaState.Walk)
+        // {
+        //     if (agent.velocity != Vector3.zero)
+        //         agent.speed = charaData.battleData.movspd * GridManage.CalculateOval(agent.velocity);
+        //     else
+        //     {
+        //         SetState(CharaState.Idle);
+        //     }
+        //
+        // }
+        // else if (state == CharaState.Attack)
+        // {
+        //     if (isAllowAttack)
+        //     {
+        //         target.getDamage(charaData.battleData.atk);
+        //         isAllowAttack = false;
+        //         Invoke("AttackCooldown", charaData.battleData.atkspd);
+        //     }
+        // }
+    }
 
 
-        
-        if (state == CharaState.Idle)
-        {
-            if (agent.velocity != Vector3.zero)
-            {
-                SetState(CharaState.Walk);
-            }
-        }
-        else if (state == CharaState.Walk)
-        {
-            if (agent.velocity != Vector3.zero)
-                agent.speed = charaData.battleData.movspd * GridManage.CalculateOval(agent.velocity);
-            else
-            {
-                SetState(CharaState.Idle);
-            }
+    private void UpdateInTeam()
+    {
+    }
 
-        }
-        else if (state == CharaState.Attack)
+    private void UpdateInVillage()
+    {
+        switch (inVillageState)
         {
-            if (isAllowAttack)
-            {
-                target.getDamage(charaData.battleData.atk);
-                isAllowAttack = false;
-                Invoke("AttackCooldown", charaData.battleData.atkspd);
-            }
+            case CharaInVillageState.Idle:
+                if (Math.Abs(charaData.hp.now - charaData.hp.max) < 0.1)
+                    SetInViilageState(CharaInVillageState.GoToUnity);
+                break;
+            case CharaInVillageState.GoToUnity:
+                if (agent.speed == 0) SetInViilageState(CharaInVillageState.Prepared);
+                break;
+            case CharaInVillageState.Prepared:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
+    }
+
+    private void SetInViilageState(CharaInVillageState newState)
+    {
+        switch (newState)
+        {
+            case CharaInVillageState.Idle:
+                break;
+            case CharaInVillageState.GoToUnity:
+                SetWalkTo(team.transform.position);
+                break;
+            case CharaInVillageState.Prepared:
+                team.CharaPrepared();
+                state = CharaState.InTeam;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
+        }
+
+        inVillageState = newState;
     }
 
     public void SetWalkTo(Vector2 pos)
@@ -136,33 +206,32 @@ public class CharaBehaviour : MonoBehaviour
         this.charaData = charaData;
     }
 
-    private void SetState(CharaState state)
+    private void SetState(CharaInTeamState inTeamState)
     {
-        this.state = state;
-        switch (state)
+        this.inTeamState = inTeamState;
+        switch (inTeamState)
         {
-            case CharaState.Idle:
+            case CharaInTeamState.Idle:
                 break;
-            case CharaState.Walk:
+            case CharaInTeamState.Walk:
                 break;
-            case CharaState.Die:
+            case CharaInTeamState.Die:
                 break;
         }
     }
 
     public void ToMovePoint()
     {
-        SetWalkTo(new Vector2(-5.2f, -3.65f));
+        // SetWalkTo(new Vector2(-5.2f, -3.65f));
     }
 
     private bool AtkRange()
     {
         if (GridManage.CalculateOval(target.transform.position - transform.position)
-                * Vector2.Distance(target.transform.position, transform.position)
-                < charaData.battleData.range)
+            * Vector2.Distance(target.transform.position, transform.position)
+            < charaData.battleData.range)
             return true;
-        else
-            return false;
+        return false;
     }
 
     private void AttackCooldown()

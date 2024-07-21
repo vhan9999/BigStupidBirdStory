@@ -65,11 +65,8 @@ public class EnemyBehaviour : MonoBehaviour
                 SetState(EnemyState.Walk);
             }
         }
-        else
-        {
-            // Vision();
-        }
 
+        // Vision();
         if (enemyData.hp.now <= 0)
         {
             Destroy(gameObject);
@@ -104,16 +101,9 @@ public class EnemyBehaviour : MonoBehaviour
 
     private void GoRandomPos() //walk around
     {
-        while (true)
-        {
-            var randomPos = new Vector2(transform.position.x + Random.Range(-1f, 1f),
-                transform.position.y + Random.Range(-1f, 1f));
-            if (TouchArea(randomPos, areaColli))
-            {
-                agent.SetDestination(randomPos);
-                break;
-            }
-        }
+        var randomPos = new Vector2(transform.position.x + Random.Range(-1f, 1f),
+            transform.position.y + Random.Range(-1f, 1f));
+        if (TouchArea(randomPos, areaColli)) agent.SetDestination(randomPos);
 
         var waitTime = Random.Range(2f, 13f);
         Invoke("GoRandomPos", waitTime);

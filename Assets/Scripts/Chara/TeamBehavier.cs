@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using UnityEngine.Events;
+using UnityEngine.AI;
 
 public enum TeamState
 {
@@ -16,20 +16,25 @@ public class TeamBehavier : MonoBehaviour
     [SerializeField] private CharaBehaviour charaBehaviour;
     [SerializeField] private EnemyBehaviour enemyBehaviour;
 
-    // private NavMeshAgent agent;
+    private NavMeshAgent agent;
     private Vector2 breakPosition;
-    private UnityAction<CharaBehaviour> onBattleStart;
     private int preparedCount;
 
 
     private void Start()
     {
-        state = TeamState.InVillage;
+        SetState(TeamState.InVillage);
+
         breakPosition = Vector2.zero;
-        // agent = GetComponent<NavMeshAgent>();
-        // if (agent == null) agent = gameObject.AddComponent<NavMeshAgent>();
-        // agent.updateRotation = false;
-        // agent.updateUpAxis = false;
+
+        #region agent
+
+        agent = GetComponent<NavMeshAgent>();
+        if (agent == null) agent = gameObject.AddComponent<NavMeshAgent>();
+        agent.updateRotation = false;
+        agent.updateUpAxis = false;
+
+        #endregion
     }
 
     private void Update()
@@ -38,27 +43,8 @@ public class TeamBehavier : MonoBehaviour
         switch (state)
         {
             case TeamState.InVillage:
-                if (Input.GetKeyDown(KeyCode.A)) charaBehaviour.SetWalkTo(transform.position);
-
-                if (Vector2.Distance(transform.position, charaBehaviour.transform.position) <
-                    0.1f) // TODO: need to use oval distance
-                    SetState(TeamState.Advanture);
                 break;
             case TeamState.Advanture:
-                if (Input.GetKeyDown(KeyCode.B))
-                {
-                    SetState(state);
-                    return;
-                }
-
-                if (Input.GetKeyDown(KeyCode.C))
-                {
-                    SetState(TeamState.Battle);
-                    // SetWalkTo(breakPosition);
-                    return;
-                }
-
-
                 // if (Input.GetKeyDown(KeyCode.C)) SetWalkTo(enemyBehaviour.transform.position);
                 var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 if (Input.GetMouseButtonDown(0))
@@ -86,7 +72,7 @@ public class TeamBehavier : MonoBehaviour
                         }
                     }
 
-                    if (target != null) charaBehaviour.SetWalkTo(target.transform.position);
+                    if (target != null) SetWalkTo(target.transform.position);
                 }
 
                 break;
@@ -95,7 +81,7 @@ public class TeamBehavier : MonoBehaviour
                     SetState(TeamState.InVillage);
                 break;
             case TeamState.Battle:
-                // wait to battle manage call on battle end
+                charaBehaviour.Attack(enemyBehaviour);
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -107,14 +93,15 @@ public class TeamBehavier : MonoBehaviour
         switch (newState)
         {
             case TeamState.InVillage:
+                agent.enabled = false;
                 break;
             case TeamState.Advanture:
+                agent.enabled = true;
                 break;
             case TeamState.BackToVillage:
                 SetWalkTo(breakPosition);
                 break;
             case TeamState.Battle:
-                onBattleStart?.Invoke(charaBehaviour);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
@@ -123,10 +110,6 @@ public class TeamBehavier : MonoBehaviour
         state = newState;
     }
 
-    public void AddOnBattleStart(UnityAction<CharaBehaviour> action)
-    {
-        onBattleStart += action;
-    }
 
     public void OnBattleEnd(bool result)
     {
@@ -151,6 +134,12 @@ public class TeamBehavier : MonoBehaviour
             state = TeamState.Advanture;
             preparedCount = 0;
         }
+    }
+
+    public void AddMember(CharaBehaviour member)
+    {
+        // memberList.Add(member);
+        charaBehaviour = member;
     }
 
     #region old
@@ -231,11 +220,6 @@ public class TeamBehavier : MonoBehaviour
     //             break;
     //     }
     // }
-    public void AddMember(CharaBehaviour member)
-    {
-        // memberList.Add(member);
-        charaBehaviour = member;
-    }
     //
     // public void DeleteMember(CharaBehaviour member)
     // {

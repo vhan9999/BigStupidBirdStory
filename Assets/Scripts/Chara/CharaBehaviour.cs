@@ -14,7 +14,9 @@ internal enum CharaInVillageState
 {
     Idle,
     GoToUnity,
+
     Prepared
+    // dalan todo: do more state in village
 }
 
 internal enum CharaInTeamState
@@ -39,13 +41,11 @@ public class CharaBehaviour : MonoBehaviour
     [SerializeField] private CharaInVillageState inVillageState;
     [SerializeField] private CharaState state;
 
-    public GameObject attackTarget;
 
     public NavMeshAgent agent;
 
     public Transform trans;
 
-    public EnemyBehaviour target;
 
     public TeamBehavier team;
     public Dictionary<Item, int> bag = new();
@@ -163,7 +163,8 @@ public class CharaBehaviour : MonoBehaviour
         switch (inVillageState)
         {
             case CharaInVillageState.Idle:
-                if (Math.Abs(charaData.hp.now - charaData.hp.max) < 0.1)
+                var isPrepared = Math.Abs(charaData.hp.now - charaData.hp.max) < 0.1;
+                if (isPrepared)
                     SetInViilageState(CharaInVillageState.GoToUnity);
                 break;
             case CharaInVillageState.GoToUnity:
@@ -181,6 +182,7 @@ public class CharaBehaviour : MonoBehaviour
         switch (newState)
         {
             case CharaInVillageState.Idle:
+                agent.enabled = true;
                 break;
             case CharaInVillageState.GoToUnity:
                 SetWalkTo(team.transform.position);
@@ -188,6 +190,7 @@ public class CharaBehaviour : MonoBehaviour
             case CharaInVillageState.Prepared:
                 team.CharaPrepared();
                 state = CharaState.InTeam;
+                agent.enabled = false;
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
@@ -225,12 +228,13 @@ public class CharaBehaviour : MonoBehaviour
         // SetWalkTo(new Vector2(-5.2f, -3.65f));
     }
 
-    private bool AtkRange()
+    private bool InAtkRange(EnemyBehaviour enemyBehaviour)
     {
-        if (GridManage.CalculateOval(target.transform.position - transform.position)
-            * Vector2.Distance(target.transform.position, transform.position)
-            < charaData.battleData.range)
-            return true;
+        // dalan todo
+        // if (GridManage.CalculateOval(target.transform.position - transform.position)
+        //     * Vector2.Distance(target.transform.position, transform.position)
+        //     < charaData.battleData.range)
+        return true;
         return false;
     }
 
@@ -243,5 +247,29 @@ public class CharaBehaviour : MonoBehaviour
     public void getDamage(float damage)
     {
         charaData.hp.now -= damage;
+    }
+
+    public void Attack(EnemyBehaviour enemyBehaviour)
+    {
+        if (InAtkRange(enemyBehaviour))
+        {
+            if (isAllowAttack)
+            {
+                // todo: create a attack obj and attack obj will call enemyBehaviour.getDamage
+                enemyBehaviour.getDamage(charaData.battleData.atk);
+                isAllowAttack = false;
+                Invoke("AttackCooldown", charaData.battleData.atkspd);
+            }
+        }
+        else
+        {
+            var transform1 = enemyBehaviour.transform;
+            Vector2 enemyPosition = transform1.position;
+
+            Vector2 position = transform.position;
+
+            var pos = enemyPosition + (position - enemyPosition).normalized * charaData.battleData.range;
+            SetWalkTo(pos);
+        }
     }
 }

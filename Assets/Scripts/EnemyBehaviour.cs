@@ -1,13 +1,15 @@
+using System;
 using System.Collections.Generic;
+using DefaultNamespace;
 using Enemy.save;
 using Player.save;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 internal enum EnemyState
 {
-    Idle,
-    Walk,
+    NotAttack,
     Attack,
     Die
 }
@@ -21,6 +23,7 @@ public class EnemyBehaviour : MonoBehaviour
     private Dictionary<GameObject, int> hateList = new();
     private bool isAllowAttack = true;
     private CharaBehaviour targetChara;
+    private TeamBehavier targetTeamBehavier;
 
     // Start is called before the first frame update
     private void Start()
@@ -45,59 +48,83 @@ public class EnemyBehaviour : MonoBehaviour
                 max = 100
             }
         };
-        state = EnemyState.Idle;
+        state = EnemyState.NotAttack;
         GoRandomPos();
     }
 
     // Update is called once per frame
     private void Update()
     {
-        if (targetChara != null)
-        {
-            if (AtkRange())
-            {
-                agent.SetDestination(transform.position);
-                SetState(EnemyState.Attack);
-            }
-            else
-            {
-                agent.SetDestination(targetChara.transform.position);
-                SetState(EnemyState.Walk);
-            }
-        }
+        // make target chara to be the nearest chara in vision
 
-        // Vision();
+
         if (enemyData.hp.now <= 0)
+            // Destroy(gameObject);
+            gameObject.SetActive(false);
+        if (agent.velocity != Vector3.zero)
+            agent.speed = enemyData.battleData.movspd * GridManage.CalculateOval(agent.velocity);
+
+        switch (state)
         {
-            Destroy(gameObject);
-        }
-        else if (state == EnemyState.Idle)
-        {
-            if (agent.velocity != Vector3.zero) SetState(EnemyState.Walk);
-        }
-        else if (state == EnemyState.Walk)
-        {
-            if (agent.velocity != Vector3.zero)
-                agent.speed = enemyData.battleData.movspd * GridManage.CalculateOval(agent.velocity);
-            else
-                SetState(EnemyState.Idle);
-        }
-        else if (state == EnemyState.Attack)
-        {
-            if (isAllowAttack)
-            {
-                targetChara.getDamage(enemyData.battleData.atk);
-                if (targetChara.charaData.hp.now <= 0)
+            case EnemyState.NotAttack:
+                var teamBehaviers = GameManager.GetTeamList();
+                foreach (var teamBehavier in teamBehaviers)
                 {
-                    targetChara = null;
-                    SetState(EnemyState.Walk);
+                    var visionDistance = 1; // todo: make this static or something
+                    // dalan todo: use 1:2 distance
+                    if (Vector2.Distance(teamBehavier.transform.position, transform.position) < visionDistance)
+                    {
+                        //target team 
+                        targetChara = teamBehavier.GetMonsterAttackChara();
+                        targetTeamBehavier = teamBehavier;
+                        SetState(EnemyState.Attack);
+                        break;
+                    }
                 }
 
-                isAllowAttack = false;
-                Invoke("AttackCooldown", enemyData.battleData.atkspd);
-            }
+                break;
+            case EnemyState.Attack:
+
+                if (targetChara == null) SetState(EnemyState.NotAttack);
+
+                if (AtkRange())
+                    if (isAllowAttack)
+                    {
+                        targetChara.getDamage(enemyData.battleData.atk);
+                        if (targetChara.charaData.hp.now <= 0) targetChara = null;
+
+                        isAllowAttack = false;
+                        Invoke("AttackCooldown", enemyData.battleData.atkspd);
+                    }
+                // else
+                // {
+                //     dalan todo: go closer
+                //     dalan todo: monster cant go village
+                //     agent.SetDestination(targetChara.transform.position);
+                // }
+
+                break;
+            case EnemyState.Die:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
+    // private void Vision() //see chara
+    // {
+    //     foreach (var chara in CharaManage.CharaList) //TODO enemy list
+    //         if (GridManage.CalculateOval(chara.transform.position - transform.position)
+    //             * Vector2.Distance(chara.transform.position, transform.position)
+    //             < enemyData.battleData.vision
+    //             && targetChara == null)
+    //         {
+    //             CancelInvoke("GoRandomPos");
+    //             targetChara = chara;
+    //             // chara.team.battleManager.AddEnemy(this);
+    //             break;
+    //             //TODO: cal hatred
+    //         }
+    // }
 
     private void GoRandomPos() //walk around
     {
@@ -122,9 +149,7 @@ public class EnemyBehaviour : MonoBehaviour
         this.state = state;
         switch (state)
         {
-            case EnemyState.Idle:
-                break;
-            case EnemyState.Walk:
+            case EnemyState.NotAttack:
                 break;
             case EnemyState.Die:
                 break;
@@ -133,21 +158,6 @@ public class EnemyBehaviour : MonoBehaviour
         }
     }
 
-    // private void Vision() //see chara
-    // {
-    //     foreach (var chara in CharaManage.CharaList) //TODO enemy list
-    //         if (GridManage.CalculateOval(chara.transform.position - transform.position)
-    //             * Vector2.Distance(chara.transform.position, transform.position)
-    //             < enemyData.battleData.vision
-    //             && targetChara == null)
-    //         {
-    //             CancelInvoke("GoRandomPos");
-    //             targetChara = chara;
-    //             // chara.team.battleManager.AddEnemy(this);
-    //             break;
-    //             //TODO: cal hatred
-    //         }
-    // }
 
     private bool AtkRange()
     {

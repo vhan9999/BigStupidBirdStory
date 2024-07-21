@@ -45,5 +45,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state: 0
-  charaBehaviour: {fileID: 0}
+  memberList: []
   enemyBehaviour: {fileID: 0}

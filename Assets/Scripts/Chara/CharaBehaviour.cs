@@ -168,7 +168,8 @@ public class CharaBehaviour : MonoBehaviour
                     SetInViilageState(CharaInVillageState.GoToUnity);
                 break;
             case CharaInVillageState.GoToUnity:
-                if (agent.speed == 0) SetInViilageState(CharaInVillageState.Prepared);
+                if (Vector2.Distance(team.transform.position, transform.position) < 0.1f)
+                    SetInViilageState(CharaInVillageState.Prepared);
                 break;
             case CharaInVillageState.Prepared:
                 break;
@@ -182,21 +183,39 @@ public class CharaBehaviour : MonoBehaviour
         switch (newState)
         {
             case CharaInVillageState.Idle:
-                agent.enabled = true;
                 break;
             case CharaInVillageState.GoToUnity:
                 SetWalkTo(team.transform.position);
                 break;
             case CharaInVillageState.Prepared:
-                team.CharaPrepared();
-                state = CharaState.InTeam;
-                agent.enabled = false;
+                SetState(CharaState.InTeam);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
         }
 
         inVillageState = newState;
+    }
+
+    private void SetState(CharaState newState)
+    {
+        switch (newState)
+        {
+            case CharaState.InVillage:
+                agent.enabled = true;
+                SetInViilageState(CharaInVillageState.Idle);
+                break;
+            case CharaState.InTeam:
+                agent.enabled = false;
+                SetState(CharaInTeamState.Idle);
+                team.CharaPrepared();
+                transform.SetParent(team.transform);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
+        }
+
+        state = newState;
     }
 
     public void SetWalkTo(Vector2 pos)
@@ -234,7 +253,7 @@ public class CharaBehaviour : MonoBehaviour
         // if (GridManage.CalculateOval(target.transform.position - transform.position)
         //     * Vector2.Distance(target.transform.position, transform.position)
         //     < charaData.battleData.range)
-        return true;
+        // return true;
         return false;
     }
 
@@ -251,6 +270,9 @@ public class CharaBehaviour : MonoBehaviour
 
     public void Attack(EnemyBehaviour enemyBehaviour)
     {
+        if (enemyBehaviour == null)
+            return;
+
         if (InAtkRange(enemyBehaviour))
         {
             if (isAllowAttack)

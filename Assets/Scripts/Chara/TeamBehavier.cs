@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
+using DefaultNamespace;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Serialization;
 
 public enum TeamState
 {
@@ -13,7 +16,11 @@ public enum TeamState
 public class TeamBehavier : MonoBehaviour
 {
     [SerializeField] private TeamState state;
-    [SerializeField] private CharaBehaviour charaBehaviour;
+
+    // [SerializeField] private float vision = 1;
+    [FormerlySerializedAs("charaBehaviours")] [FormerlySerializedAs("charaBehaviour")] [SerializeField]
+    private List<CharaBehaviour> memberList = new();
+
     [SerializeField] private EnemyBehaviour enemyBehaviour;
 
     private NavMeshAgent agent;
@@ -23,8 +30,6 @@ public class TeamBehavier : MonoBehaviour
 
     private void Start()
     {
-        SetState(TeamState.InVillage);
-
         breakPosition = Vector2.zero;
 
         #region agent
@@ -33,6 +38,8 @@ public class TeamBehavier : MonoBehaviour
         if (agent == null) agent = gameObject.AddComponent<NavMeshAgent>();
         agent.updateRotation = false;
         agent.updateUpAxis = false;
+
+        SetState(TeamState.InVillage);
 
         #endregion
     }
@@ -58,7 +65,7 @@ public class TeamBehavier : MonoBehaviour
                     EnemyBehaviour target = null;
                     foreach (var enemy in enemyList)
                     {
-                        var distance = Vector2.Distance(enemy.transform.position, charaBehaviour.transform.position);
+                        var distance = Vector2.Distance(enemy.transform.position, transform.position);
                         if (distance < minDistance)
                         {
                             minDistance = distance;
@@ -77,15 +84,23 @@ public class TeamBehavier : MonoBehaviour
 
                 break;
             case TeamState.BackToVillage:
-                if (Vector2.Distance(charaBehaviour.transform.position, transform.position) < 0.1f)
-                    SetState(TeamState.InVillage);
+                var arrive = true;
+                foreach (var chara in memberList)
+                    arrive = arrive && Vector2.Distance(chara.transform.position, transform.position) < 0.1f;
+                if (arrive) SetState(TeamState.InVillage);
                 break;
             case TeamState.Battle:
-                charaBehaviour.Attack(enemyBehaviour);
+                foreach (var chara in memberList)
+                    chara.Attack(enemyBehaviour); // todo: chara have different target, not important
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        Debug.Log(other.transform.name);
     }
 
     private void SetState(TeamState newState)
@@ -93,9 +108,11 @@ public class TeamBehavier : MonoBehaviour
         switch (newState)
         {
             case TeamState.InVillage:
+                foreach (var c in memberList) c.transform.SetParent(GameManager.GetCharaContainer().transform);
                 agent.enabled = false;
                 break;
             case TeamState.Advanture:
+                Debug.Log("ADventure");
                 agent.enabled = true;
                 break;
             case TeamState.BackToVillage:
@@ -121,9 +138,9 @@ public class TeamBehavier : MonoBehaviour
 
     private void SetWalkTo(Vector2 pos)
     {
-        // agent.SetDestination(pos);
-        charaBehaviour.SetWalkTo(pos);
-        transform.position = pos;
+        agent.SetDestination(pos);
+        // foreach (var chara in memberList) chara.SetWalkTo(pos);
+        // transform.position = pos;
     }
 
     public void CharaPrepared()
@@ -131,25 +148,25 @@ public class TeamBehavier : MonoBehaviour
         preparedCount++;
         if (preparedCount == 1)
         {
-            state = TeamState.Advanture;
+            SetState(TeamState.Advanture);
             preparedCount = 0;
         }
     }
 
     public void AddMember(CharaBehaviour member)
     {
-        // memberList.Add(member);
-        charaBehaviour = member;
+        memberList.Add(member);
+    }
+
+    public CharaBehaviour GetMonsterAttackChara()
+    {
+        if (memberList.Count == 0) return null;
+
+        return memberList[0]; // todo: get chara which is most suitable to be attack
     }
 
     #region old
 
-    // public List<CharaBehaviour> memberList = new List<CharaBehaviour>();
-    // public GameObject area;
-    //
-    //
-    //
-    // [SerializeField] private float vision = 1;
     // private float speed = 1;
     // private NavMeshAgent agent;
     // private PolygonCollider2D areaColli;
@@ -219,11 +236,6 @@ public class TeamBehavier : MonoBehaviour
     //             CancelInvoke("GoRandomPos");
     //             break;
     //     }
-    // }
-    //
-    // public void DeleteMember(CharaBehaviour member)
-    // {
-    //     memberList.Remove(member);
     // }
     //
     // private void Vision()//see enemy

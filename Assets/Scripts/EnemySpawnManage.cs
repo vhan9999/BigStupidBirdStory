@@ -43,4 +43,14 @@ public class EnemySpawnManage : MonoBehaviour
             if (!e.GameObject().gameObject.activeSelf)
                 e.GameObject().gameObject.SetActive(!e.GameObject().gameObject.activeSelf);
     }
+
+    public void SetContainer(GameObject enemyBehavierContainer)
+    {
+        enemyParent = enemyBehavierContainer;
+    }
+
+    public void SetPrefab(EnemyBehaviour prefab)
+    {
+        enemyPrefab = prefab;
+    }
 }

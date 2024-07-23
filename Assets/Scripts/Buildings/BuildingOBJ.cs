@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class BuildingOBJ : ClickableOBJ
 {
@@ -31,7 +32,12 @@ public class BuildingOBJ : ClickableOBJ
         editGridCollider = editGrid.GetComponent<PolygonCollider2D>();
         editGridSprite = editGrid.GetComponent<SpriteRenderer>();
         SetColor(EditState.Normal);
-        //todo: entrys
+        
+        foreach(Transform entry in transform.GetChild(0).GetComponentsInChildren<Transform>())
+        {
+            if(entry != transform.GetChild(0))  
+                entrys.Add(entry.position);
+        }
     }
 
     public void SetColor(EditState state)
@@ -69,7 +75,7 @@ public class BuildingOBJ : ClickableOBJ
     {
         transform.position =
             new Vector3(transform.position.x, transform.position.y,
-                transform.position.y + 0.25f * width);
+                transform.position.y);
 
         editGrid.transform.position = new Vector3(
             transform.position.x, transform.position.y, 100f);

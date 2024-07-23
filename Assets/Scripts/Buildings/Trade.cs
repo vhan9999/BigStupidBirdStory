@@ -7,6 +7,7 @@ public class Trade : BuildingOBJ
 {
     private List<CharaBehaviour> charaList = new List<CharaBehaviour>();
     private Dictionary<Item,int> buyList = new Dictionary<Item, int>();//int -> player want to buy
+    [SerializeField] private TradeUIManager tradeUIManager;
     void Start()
     {
         AddItem1();
@@ -19,6 +20,10 @@ public class Trade : BuildingOBJ
         
     }
 
+    public override void Click()
+    {
+        tradeUIManager.OpenUI();
+    }
     void CharaIn(CharaBehaviour chara)
     {
         charaList.Add(chara);
@@ -49,7 +54,7 @@ public class Trade : BuildingOBJ
 
                     if(chara.bag[item] <= 0) chara.bag.Remove(item);
 
-                    break; // to extend the trade time, every one sell a item per sec
+                    break; // to extend the trade time, everyone sell a kind of item per sec
                 }
             }
             if (!isTradeThisTime) CharaOut(chara);

@@ -10,6 +10,18 @@ internal enum ControlState
     Edit
 }
 
+public enum BuildingType
+{
+    Trade,
+    Alter,
+    Guild,
+    Restuarant,
+    Hospital,
+    Bar,
+    Hotel,
+    Blacksmith
+}
+
 public class TouchManage : MonoBehaviour, ILongPressable, IClickable, IEndTouch, IStartTouch, IMoveable
 {
     public GameObject buildingPrefab;
@@ -82,7 +94,6 @@ public class TouchManage : MonoBehaviour, ILongPressable, IClickable, IEndTouch,
 
     public void CreateBuilding()
     {
-        //todo:building type
         if (controlState == ControlState.Edit) return;
         var b = Instantiate(buildingPrefab, buildingContainer.transform);
         var bobj = b.GetComponent<BuildingOBJ>();
@@ -151,6 +162,11 @@ public class TouchManage : MonoBehaviour, ILongPressable, IClickable, IEndTouch,
         switch (controlState)
         {
             case ControlState.Normal:
+                var tb = TouchBuilding(position);
+                if (tb != null)
+                {
+                    tb.Click();
+                }
                 break;
             case ControlState.Edit:
                 break;

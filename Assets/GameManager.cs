@@ -1,5 +1,5 @@
 ﻿// #define TEAM
-// #define BUILDING
+#define BUILDING
 
 #define TEST
 

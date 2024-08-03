@@ -170,6 +170,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18ff011042558894bb2780482869339c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  trade: {fileID: 1954028535439929875}
   canvas: {fileID: 0}
   itemButtonPrefab: {fileID: 7889393824777247173, guid: 03599fcd35384ec41981da26d971f515, type: 3}
 --- !u!1001 &5401807929482830082

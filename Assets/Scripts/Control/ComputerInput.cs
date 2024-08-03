@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 namespace DefaultNamespace
 {
@@ -24,6 +25,8 @@ namespace DefaultNamespace
             // Detect the first click
             if (Input.GetMouseButtonDown(0))
             {
+                if (EventSystem.current.IsPointerOverGameObject())
+                    return;
                 totalDownTime = 0;
                 clicking = true;
                 var worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);

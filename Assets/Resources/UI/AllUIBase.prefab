@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8981648746042521812}
   - component: {fileID: 8260554840379232795}
   m_Layer: 5
-  m_Name: BuildingUIBase
+  m_Name: AllUIBase
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -791,7 +791,7 @@ GameObject:
   - component: {fileID: 6040393491915997678}
   - component: {fileID: 8959900342616556415}
   m_Layer: 5
-  m_Name: CustumPart
+  m_Name: CustomPart
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

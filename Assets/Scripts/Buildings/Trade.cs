@@ -23,6 +23,7 @@ public class Trade : BuildingOBJ
     public override void Click()
     {
         tradeUIManager.OpenUI();
+        tradeUIManager.UpdateItems(buyList);
     }
     void CharaIn(CharaBehaviour chara)
     {
@@ -46,6 +47,7 @@ public class Trade : BuildingOBJ
                     isTradeThisTime = true;
                     int tradeNum;
 
+                    if (buyList[item] < 0) tradeNum = chara.bag[item];//infinite
                     if (chara.bag[item] >= buyList[item]) tradeNum = buyList[item];
                     else tradeNum = chara.bag[item];
 
@@ -64,7 +66,13 @@ public class Trade : BuildingOBJ
     void AddItem1()//add items in item list
     {
         buyList.Add(Item.CreateInstance("item1", 10), 0);
-        buyList.Add(Item.CreateInstance("item1", 27), 0);
-        buyList.Add(Item.CreateInstance("item1", 3), 0);
+        buyList.Add(Item.CreateInstance("item2", 27), 0);
+        buyList.Add(Item.CreateInstance("item3", 3), 0);
+    }
+
+    public void PreOrder(Item item, int num)
+    {
+        buyList[item] = num;
+        tradeUIManager.UpdateItems(buyList);
     }
 }

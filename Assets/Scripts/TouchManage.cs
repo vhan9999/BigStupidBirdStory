@@ -24,7 +24,8 @@ public enum BuildingType
 
 public class TouchManage : MonoBehaviour, ILongPressable, IClickable, IEndTouch, IStartTouch, IMoveable
 {
-    public GameObject buildingPrefab;
+    public GameObject TradePrefab;
+
     public GameObject buildingContainer;
     public List<BuildingOBJ> buildingList = new();
     [SerializeField] private BuildingOBJ movingGameObject;
@@ -92,9 +93,17 @@ public class TouchManage : MonoBehaviour, ILongPressable, IClickable, IEndTouch,
     }
 
 
-    public void CreateBuilding()
+    public void CreateBuilding(int bt)
     {
         if (controlState == ControlState.Edit) return;
+        GameObject buildingPrefab = TradePrefab;
+        switch ((BuildingType)bt)
+        {
+            case BuildingType.Trade:
+                buildingPrefab = TradePrefab;
+                break;
+        }
+        
         var b = Instantiate(buildingPrefab, buildingContainer.transform);
         var bobj = b.GetComponent<BuildingOBJ>();
         if (movingGameObject != null) movingGameObject.SetColor(BuildingOBJ.EditState.Normal);
@@ -139,8 +148,8 @@ public class TouchManage : MonoBehaviour, ILongPressable, IClickable, IEndTouch,
                 controlState = ControlState.Edit;
                 tb.SetColor(BuildingOBJ.EditState.NoOverlapping);
                 movingGameObject = tb;
+                EditEndButton.SetActive(true);
             }
-            EditEndButton.SetActive(true);
         }
     }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 namespace DefaultNamespace
 {
@@ -26,6 +27,8 @@ namespace DefaultNamespace
                 switch (touch.phase)
                 {
                     case TouchPhase.Began:
+                        if (EventSystem.current.IsPointerOverGameObject())
+                            return;
                         clicking = true;
                         totalDownTime = 0;
                         // moved = false;

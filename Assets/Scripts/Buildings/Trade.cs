@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using static UnityEditor.Timeline.Actions.MenuPriority;
 
@@ -12,12 +13,6 @@ public class Trade : BuildingOBJ
     {
         AddItem1();
         InvokeRepeating("Trading", 1f, 1f);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public override void Click()
@@ -42,16 +37,17 @@ public class Trade : BuildingOBJ
             bool isTradeThisTime = false;
             foreach (Item item in chara.bag.Keys)
             {
-                if (buyList[item] > 0)//trade success
+                Item buyitem = buyList.Keys.FirstOrDefault(buy => item.itemName == buy.itemName);
+                if (buyList[buyitem] != 0)//trade success
                 {
                     isTradeThisTime = true;
                     int tradeNum;
 
-                    if (buyList[item] < 0) tradeNum = chara.bag[item];//infinite
-                    if (chara.bag[item] >= buyList[item]) tradeNum = buyList[item];
+                    if (buyList[buyitem] < 0) tradeNum = chara.bag[item];//infinite
+                    if (chara.bag[item] >= buyList[buyitem]) tradeNum = buyList[buyitem];
                     else tradeNum = chara.bag[item];
 
-                    buyList[item] -= tradeNum;
+                    buyList[buyitem] -= tradeNum;
                     chara.bag[item] -= tradeNum;
 
                     if(chara.bag[item] <= 0) chara.bag.Remove(item);
@@ -63,7 +59,7 @@ public class Trade : BuildingOBJ
         }
     }
 
-    void AddItem1()//add items in item list
+    private void AddItem1()//add items in item list
     {
         buyList.Add(Item.CreateInstance("item1", 10), 0);
         buyList.Add(Item.CreateInstance("item2", 27), 0);
